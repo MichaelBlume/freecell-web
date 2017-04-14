@@ -46,11 +46,7 @@
   (let [selected (subscribe [:selected i])]
     (fn [i cards]
       [:div
-       {:class "card-column"
-        :style (merge
-                 {:float :left}
-                 (when @selected
-                   {:background-color :grey}))
+       {:class (classes "card-column" (when @selected "card-column-selected"))
         :on-click #(dispatch [:click-column i])}
        (for [c (or (seq (reverse cards)) [nil])]
          ^{:key (display-string c)}

@@ -31,9 +31,13 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     text-align: center;
 }
 
+.card-column {
+    display: inline-block;
+}
+.card-column-selected { background-color: #ccffcc; }
+
 .bottom-row { 
     display: inline;
-    float: left;
 }
 .bottom-row span {
     display: inline-block;
