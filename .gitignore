@@ -2,4 +2,6 @@
 /target
 /*-init.clj
 /resources/public/js/compiled
+*~
+*.swp
 out
