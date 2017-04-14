@@ -19,10 +19,10 @@
 (defn shuffled-deck [] (shuffle deck))
 
 (def suit-chars
-  {:spades \S
-   :hearts \H
-   :clubs \C
-   :diamonds \D})
+  {:spades \u2660
+   :hearts \u2665
+   :clubs \u2663
+   :diamonds \u2666})
 
 (def face-chars
   {1 \A
