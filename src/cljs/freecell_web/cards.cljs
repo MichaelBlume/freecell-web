@@ -29,7 +29,9 @@
    13 \K})
 
 (defn display-string [card]
-  (str (face-chars (:n card) (:n card)) (suit-chars (:suit card))))
+  (if (and card (> (:n card) 0))
+    (str (face-chars (:n card) (:n card)) (suit-chars (:suit card)))
+    "__"))
 
 (defn flip [vs] (apply map vector vs))
 
