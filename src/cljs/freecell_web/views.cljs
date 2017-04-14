@@ -6,7 +6,9 @@
 
 (defn card [c & [on-click]]
   [:span
-   {:style {:color (color c)}
+   {:class (if c
+             (str (name (color c)) " n" (:n c) " " (name (:suit c)) " card")
+             "no-card")
     :on-click on-click}
    (display-string c)])
 
@@ -17,7 +19,7 @@
   (let [cells (subscribe [:cells])]
     (fn []
       [:div
-       {:style {:float :left}}
+       {:class "free-cells"}
        (for [[i c] (enumerate @cells)]
          ^{:key i}
          [card c #(dispatch [:click-freecell i])])])))
@@ -40,7 +42,8 @@
   (let [selected (subscribe [:selected i])]
     (fn [i cards]
       [:div
-       {:style (merge
+       {:class "card-column"
+        :style (merge
                  {:float :left}
                  (when @selected
                    {:background-color :grey}))
@@ -61,17 +64,18 @@
 
 (defn bottom-row []
   [:div
-   {:style {:float :down}}
-   [:p
+   {:style {:float :down}
+    :class "bottom-row"}
+   [:span
     {:on-click #(dispatch [:undo])}
     "Undo"]
-   [:p
+   [:span
     {:on-click #(dispatch [:initialize-db])}
     "New game"]
-   [:p
+   [:span
     {:on-click #(dispatch [:redo])}
     "Redo"]
-   [:p
+   [:span
     {:on-click #(dispatch [:auto-sink])}
     "Sink"]])
 

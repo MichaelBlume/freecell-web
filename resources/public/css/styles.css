@@ -1,0 +1,44 @@
+body { font-family: "Noto Sans", "Verdana", sans-serif; }
+
+.red { 
+    color: red; 
+    border-color: red;
+}
+.hearts {
+    background-color: #ffcccc;
+}
+.diamonds {
+    background-color: #ffeeee;
+}
+
+.black { 
+    color: black; 
+    border-color: black; 
+}
+.spades {
+    background-color: #cccccc; 
+}
+.clubs {
+    background-color: #eeeeee; 
+}
+
+.card {
+    display: inline-block;
+    width: 1.75em;
+    padding: 0.25em; 
+    margin: 0.25em; 
+    border: 1pt solid;
+    text-align: center;
+}
+
+.bottom-row { 
+    display: inline;
+    float: left;
+}
+.bottom-row span {
+    display: inline-block;
+    padding: 0.25em;
+    margin: 0.25em;
+    color: #666699;
+    background-color: #ccccff;
+}
