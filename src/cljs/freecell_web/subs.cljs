@@ -2,6 +2,7 @@
     (:require-macros [reagent.ratom :refer [reaction]])
     (:require [re-frame.core :refer [reg-sub subscribe]]
               [freecell-web.cards :refer [suits]]
+              [freecell-web.db :refer [selected]]
               ))
 
 (reg-sub
@@ -29,7 +30,7 @@
 (reg-sub
   :selected
   (fn [db [_ n]]
-    (= n (-> db :ui-state :selected-column))))
+    (= [:column n] (selected db))))
 
 (reg-sub
   ; re-built every time game-state changes -- bad?
