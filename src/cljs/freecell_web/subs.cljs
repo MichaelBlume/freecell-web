@@ -6,11 +6,6 @@
               ))
 
 (reg-sub
- :name
- (fn [db]
-   (:name db)))
-
-(reg-sub
  :game-state
  (fn [db]
    (:cards-state db)))
@@ -40,15 +35,6 @@
     (for [suit suits]
       (let [n (-> game-state :sinks suit)]
         {:suit suit :n n}))))
-
-(reg-sub
-  :column
-  (fn [[_ n] _]
-    [(subscribe [:columns])
-     (subscribe [:selected n])])
-  (fn [[columns selected] [_ n]]
-    {:cards (nth columns n)
-     :selected selected}))
 
 (reg-sub
   :ui-state
