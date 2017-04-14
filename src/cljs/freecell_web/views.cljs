@@ -37,18 +37,19 @@
    [sinks]])
 
 (defn column [i cards]
-  (let [selected @(subscribe [:selected i])]
-    [:div
-     {:style (merge
-               {:float :left}
-               (when selected
-                 {:background-color :grey}))
-      :on-click #(dispatch [:click-column i])}
-     (for [c (or (seq (reverse cards)) [nil])]
-       ^{:key (display-string c)}
-       [:p
-        {:style {:text-align :right}}
-        [card c]])]))
+  (let [selected (subscribe [:selected i])]
+    (fn [i cards]
+      [:div
+       {:style (merge
+                 {:float :left}
+                 (when @selected
+                   {:background-color :grey}))
+        :on-click #(dispatch [:click-column i])}
+       (for [c (or (seq (reverse cards)) [nil])]
+         ^{:key (display-string c)}
+         [:p
+          {:style {:text-align :right}}
+          [card c]])])))
 
 (defn columns []
   (let [cs (subscribe [:columns])]
