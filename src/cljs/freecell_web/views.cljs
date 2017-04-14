@@ -52,9 +52,7 @@
         :on-click #(dispatch [:click-column i])}
        (for [[i c] (enumerate (or (seq (reverse cards)) [nil]))]
          ^{:key i}
-         [:p
-          {:style {:text-align :right}}
-          [card c "column"]])])))
+         [card c "column"])])))
 
 (defn columns []
   (let [cs (subscribe [:columns])]
