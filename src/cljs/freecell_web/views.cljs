@@ -50,8 +50,8 @@
       [:div
        {:class (classes "card-column" (when @selected "card-column-selected"))
         :on-click #(dispatch [:click-column i])}
-       (for [c (or (seq (reverse cards)) [nil])]
-         ^{:key (display-string c)}
+       (for [[i c] (enumerate (or (seq (reverse cards)) [nil]))]
+         ^{:key i}
          [:p
           {:style {:text-align :right}}
           [card c "column"]])])))
