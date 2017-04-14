@@ -1,13 +1,17 @@
 (ns freecell-web.views
     (:require [re-frame.core :refer [subscribe dispatch]]
               [cljs.pprint :refer [pprint]]
+              [clojure.string :refer [join]]
               [freecell-web.subs]
               [freecell-web.cards :refer [display-string color]]))
+
+(defn classes [& cs]
+  (join \space (map name (filter identity cs))))
 
 (defn card [c & [on-click]]
   [:span
    {:class (if c
-             (str (name (color c)) " n" (:n c) " " (name (:suit c)) " card")
+             (classes (color c) (:suit c) (str "n" (:n c)) "card")
              "no-card")
     :on-click on-click}
    (display-string c)])
