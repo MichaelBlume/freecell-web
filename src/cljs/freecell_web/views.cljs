@@ -25,7 +25,7 @@
   (let [cells (subscribe [:cells])]
     (fn []
       [:div
-       {:class "free-cells"}
+       {:class "hold-freecells"}
        (for [[i c] (enumerate @cells)]
          ^{:key i}
          [card c "freecell" #(dispatch [:click-freecell i])])])))
@@ -34,7 +34,8 @@
   (let [cards (subscribe [:sinks])]
     (fn []
       [:div
-       {:on-click #(dispatch [:click-sink])}
+       {:class "hold-sinks"
+        :on-click #(dispatch [:click-sink])}
        (for [c @cards]
          ^{:key (:suit c)}
          [card c "sink"])])))
