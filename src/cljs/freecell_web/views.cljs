@@ -35,8 +35,7 @@
     (fn []
       [:div
        {:class "hold-sinks"
-        :on-click #(dispatch [:click-sink])
-        :class "sinks"}
+        :on-click #(dispatch [:click-sink])}
        (for [c @cards]
          ^{:key (:suit c)}
          [card c "sink"])])))
