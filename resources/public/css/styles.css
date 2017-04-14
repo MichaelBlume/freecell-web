@@ -22,13 +22,20 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     background-color: #eeeeee; 
 }
 
-.card {
+
+.card, .no-card {
     display: inline-block;
     width: 1.75em;
     padding: 0.25em; 
     margin: 0.25em; 
-    border: 1pt solid;
     text-align: center;
+}
+.card {
+    border: 1pt solid;
+}
+.no-card {
+    background-color: #aaccee;
+    border: 1pt solid #aaccee;
 }
 
 .card-column {
