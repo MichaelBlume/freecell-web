@@ -35,13 +35,15 @@
     (fn []
       [:div
        {:class "hold-sinks"
-        :on-click #(dispatch [:click-sink])}
+        :on-click #(dispatch [:click-sink])
+        :class "sinks"}
        (for [c @cards]
          ^{:key (:suit c)}
          [card c "sink"])])))
 
 (defn top-row []
   [:div
+   {:class "top-row"}
    [freecells]
    [sinks]])
 
@@ -59,6 +61,7 @@
   (let [cs (subscribe [:columns])]
     (fn []
       [:div
+       {:class "columns"}
        (for [[i c] (map-indexed vector @cs)]
          ^{:key i}
          [column i c])])))
@@ -87,12 +90,8 @@
 
 (defn main-panel []
   [:div
-   [:div
-    [top-row]]
-   [:div
-    [columns]]
+   {:class "freecell-game"}
+   [top-row]
+   [columns]
    [bottom-row]
-   [:div
-    [ui-display]
-    ]
-   ])
+   [ui-display]])
