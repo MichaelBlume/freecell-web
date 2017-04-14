@@ -1,6 +1,7 @@
 (ns freecell-web.views
     (:require [re-frame.core :refer [subscribe dispatch]]
               [cljs.pprint :refer [pprint]]
+              [freecell-web.subs]
               [freecell-web.cards :refer [display-string color]]))
 
 (defn card [c & [on-click]]
