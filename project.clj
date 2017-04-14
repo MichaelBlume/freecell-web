@@ -1,6 +1,6 @@
 (defproject freecell-web "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.494"]
+                 [org.clojure/clojurescript "1.9.518"]
                  [reagent "0.6.1"]
                  [re-frame "0.9.2"]]
 
@@ -16,7 +16,7 @@
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.8.2"]]
+   {:dependencies [[binaryage/devtools "0.9.3"]]
 
     :plugins      [[lein-figwheel "0.5.9"]]
     }}
