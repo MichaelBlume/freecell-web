@@ -17,7 +17,11 @@
     (let [cs (:columns game-state)
           longest (apply max (map count cs))]
       (for [c cs]
-        (concat (repeat (- longest (count c)) nil) c)))))
+        (concat
+          (repeat
+            (- longest (count c))
+            nil)
+          c)))))
 
 (reg-sub
   :cells
