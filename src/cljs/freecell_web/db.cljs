@@ -5,7 +5,25 @@
   {:name "re-frame"})
 
 (defn init-ui []
-  {:selected-column nil})
+  ; three possible states -- nil, [:column n], [:freecell n]
+  {:selected nil})
+
+(defn clear-ui [state]
+  (assoc-in state [:ui-state] (init-ui)))
+
+(defn selected [state] (-> state :ui-state :selected))
+
+(defn selected-area [state] (-> state selected first))
+
+(defn update-card-state [{:keys [undo-states cards-state] :as db} f]
+
+  (let [new-cs (f cards-state)]
+    (if (and new-cs (not= new-cs cards-state))
+      {:undo-states (cons cards-state undo-states)
+       :redo-states nil
+       :ui-state (init-ui)
+       :cards-state new-cs}
+      (clear-ui db))))
 
 (defn init-state
   ([] (init-state (shuffled-deck)))

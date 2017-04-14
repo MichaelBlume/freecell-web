@@ -1,8 +1,119 @@
 (ns freecell-web.events
-    (:require [re-frame.core :as re-frame]
-              [freecell-web.db :as db]))
+    (:require [re-frame.core :refer [reg-event-db]]
+              [freecell-web.cards :refer
+               [goes-on run-move sink can-sink should-sink]]
+              [freecell-web.db :refer
+               [selected update-card-state init-state undo redo clear-ui]]))
 
-(re-frame/reg-event-db
+
+(reg-event-db
  :initialize-db
  (fn  [_ _]
-   db/default-db))
+   (init-state)))
+
+(defn move-column [card-state on tn]
+  (let [{:keys [columns freecells]} card-state
+        empty-count (count (filter not freecells))
+        new-columns (run-move columns on tn (inc empty-count))]
+    (when new-columns
+      (assoc card-state :columns new-columns))))
+
+(defn freecell-to-column [card-state fcn cn]
+  (let [{:keys [columns freecells]} card-state
+        mc (nth freecells fcn)
+        col (nth columns cn)
+        tc (first col)]
+    (when (and mc (goes-on mc tc))
+      (-> card-state
+          (update-in [:columns cn] #(cons mc %))
+          (assoc-in [:freecells fcn] nil)))))
+
+(reg-event-db
+  :click-column
+  (fn [db [_ n]]
+    (if-let [[or-type or-n] (selected db)]
+      (update-card-state
+        db
+        (if (= or-type :column)
+          #(move-column % or-n n)
+          #(freecell-to-column % or-n n)))
+      (assoc-in db [:ui-state :selected] [:column n]))))
+
+(defn column-to-freecell [card-state cn fcn]
+  (let [{:keys [columns freecells]} card-state
+        col (nth columns cn)
+        mc (first col)
+        fcc (nth freecells fcn)]
+    (when (and mc (not fcc))
+      (-> card-state
+          (update-in [:columns cn] rest)
+          (assoc-in [:freecells fcn] mc)))))
+
+(reg-event-db
+  :click-freecell
+  (fn [db [_ n]]
+    (if-let [[or-type or-n] (selected db)]
+      (update-card-state
+        db
+        (if (= or-type :column)
+          #(column-to-freecell % or-n n)
+          (constantly nil)))
+      (assoc-in db [:ui-state :selected] [:freecell n]))))
+
+(defn column-to-sink [card-state n]
+  (let [{:keys [columns sinks]} card-state
+        col (nth columns n)
+        card (first col)]
+    (when (and card (can-sink card sinks))
+      (-> card-state
+          (update-in [:columns n] rest)
+          (update-in [:sinks] #(sink card %))))))
+
+(defn freecell-to-sink [card-state n]
+  (let [{:keys [freecells sinks]} card-state
+        card (nth freecells n)]
+    (when (and card (can-sink card sinks))
+      (-> card-state
+          (assoc-in [:freecells n] nil)
+          (update-in [:sinks] #(sink card %))))))
+
+(reg-event-db
+  :click-sink
+  (fn [db _]
+    (update-card-state
+      db
+      (fn [card-state]
+        (when-let [[or-type n] (selected db)]
+          (if (= or-type :column)
+            (column-to-sink card-state n)
+            (freecell-to-sink card-state n)))))))
+
+(reg-event-db
+  :undo
+  (fn [db _]
+    (or (undo db) db)))
+
+(reg-event-db
+  :redo
+  (fn [db _]
+    (or (redo db) db)))
+
+(reg-event-db
+  :auto-sink
+  (fn [db _]
+    (update-card-state
+      db
+      (fn [{:keys [:columns :freecells :sinks] :as card-state}]
+        (if-let [n (some
+                     identity
+                     (for [i (range 4)]
+                       (when (should-sink (nth freecells i) sinks)
+                         i)))]
+          (freecell-to-sink card-state n)
+          (when-let [n (some
+                         identity
+                         (for [i (range 8)]
+                           (when (should-sink
+                                   (first (nth columns i)) sinks)
+                             i)))]
+            (column-to-sink card-state n)))))))

@@ -1,5 +1,7 @@
 (ns freecell-web.cards)
 
+(def suits [:spades :hearts :clubs :diamonds])
+
 (def colors
   {:spades :black
    :hearts :red
