@@ -34,8 +34,14 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     border: 1pt solid;
 }
 .no-card {
-    background-color: #aaccee;
-    border: 1pt solid #aaccee;
+    border: 1pt solid transparent;
+}
+
+.no-card.freecell {
+    background-color: #e0e8ff;
+}
+.no-card.column {
+    background-color: #e8e0ff;
 }
 
 .card-column {
