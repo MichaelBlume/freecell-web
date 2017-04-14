@@ -50,14 +50,16 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     display: inline-block;
 }
 .card-column-selected { background-color: #ccffcc; }
+.card.column, .no-card.column { display: block; }
 
 .bottom-row { 
     display: inline;
 }
 .bottom-row span {
     display: inline-block;
-    padding: 0.25em;
+    padding: 0.4em;
     margin: 0.25em;
-    color: #666699;
-    background-color: #ccccff;
+    color: #404060;
+    background-color: #c0c0ff;
+    border-radius: 0.4em;
 }
