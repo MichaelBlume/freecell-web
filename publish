@@ -1,0 +1,9 @@
+git pull
+git clean -fxd
+lein cljsbuild once min
+cp resources/public/js/compiled/app.js ../michaelblume.github.io/js/compiled/app.js
+cp resources/public/css/styles.css ../michaelblume.github.io/css/styles.css
+cd ../michaelblume.github.io
+git add .
+git commit -m "update"
+git push
