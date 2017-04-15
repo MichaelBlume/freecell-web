@@ -1,14 +1,7 @@
 (ns freecell-web.subs
-    (:require-macros [reagent.ratom :refer [reaction]])
-    (:require [re-frame.core :refer [reg-sub subscribe]]
+    (:require [re-frame.core :refer [reg-sub]]
               [freecell-web.cards :refer [suits]]
-              [freecell-web.db :refer [selected]]
-              ))
-
-(reg-sub
- :game-state
- (fn [db]
-   (:cards-state db)))
+              [freecell-web.db :refer [selected]]))
 
 (reg-sub
   :columns
