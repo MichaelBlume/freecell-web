@@ -41,7 +41,7 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     background-color: #e0e8ff;
 }
 .no-card.column {
-    background-color: #e8e0ff;
+    color: transparent;
 }
 
 .hold-freecells, .hold-sinks { display: inline-block; }
