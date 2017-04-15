@@ -26,9 +26,10 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
 .card, .no-card {
     display: inline-block;
     width: 1.75em;
-    padding: 0.25em; 
+    padding: 0.25em;
     margin: 0.25em; 
     text-align: center;
+    border-radius: 0.25em;
 }
 .card {
     border: 1pt solid;
@@ -40,11 +41,12 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
 .no-card.freecell {
     background-color: #e0e8ff;
 }
-.no-card.column {
+.no-card {
     color: transparent;
 }
 
 .hold-freecells, .hold-sinks { display: inline-block; }
+.top-row { margin-bottom: 1em; }
 
 .card-column {
     display: inline-block;
