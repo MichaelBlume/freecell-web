@@ -82,15 +82,10 @@
     {:on-click #(dispatch [:auto-sink])}
     "Sink"]])
 
-(defn ui-display []
-  (let [us (subscribe [:ui-state])]
-    (fn []
-      [:p (with-out-str (pprint @us))])))
-
 (defn main-panel []
   [:div
    {:class "freecell-game"}
    [top-row]
    [columns]
    [bottom-row]
-   [ui-display]])
+   ])

@@ -42,8 +42,3 @@
     (for [suit suits]
       (let [n (-> game-state :sinks suit)]
         {:suit suit :n n}))))
-
-(reg-sub
-  :ui-state
-  (fn [db] (:ui-state db))
-  )
