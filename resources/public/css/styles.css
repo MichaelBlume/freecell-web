@@ -57,7 +57,7 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
 .bottom-row { 
     display: inline;
 }
-.bottom-row span {
+.bottom-row button {
     display: inline-block;
     padding: 0.4em;
     margin: 0.25em;

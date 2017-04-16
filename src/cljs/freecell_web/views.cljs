@@ -69,16 +69,16 @@
   [:div
    {:style {:float :down}
     :class "bottom-row"}
-   [:span
+   [:button
     {:on-click #(dispatch [:undo])}
     "Undo"]
-   [:span
+   [:button
     {:on-click #(dispatch [:initialize-db])}
     "New game"]
-   [:span
+   [:button
     {:on-click #(dispatch [:redo])}
     "Redo"]
-   [:span
+   [:button
     {:on-click #(dispatch [:auto-sink])}
     "Sink"]])
 
