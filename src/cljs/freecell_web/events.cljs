@@ -116,10 +116,12 @@
 (reg-event-db
   :auto-sink
   (fn [db _]
-    (update-card-state
-      db
-      (fn [{:keys [:columns :freecells :sinks] :as card-state}]
-        (if-let [n (sinkable-freecell freecells sinks)]
-          (freecell-to-sink card-state n)
-          (when-let [n (sinkable-column columns sinks)]
-            (column-to-sink card-state n)))))))
+    (if-not (selected db)
+      (update-card-state
+        db
+        (fn [{:keys [:columns :freecells :sinks] :as card-state}]
+          (if-let [n (sinkable-freecell freecells sinks)]
+            (freecell-to-sink card-state n)
+            (when-let [n (sinkable-column columns sinks)]
+              (column-to-sink card-state n)))))
+      db)))
