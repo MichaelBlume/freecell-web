@@ -98,22 +98,28 @@
   (fn [db _]
     (or (redo db) db)))
 
+(defn firstn [s pred]
+  (some
+    identity
+    (map-indexed (fn [i x] (when (pred x) i)) s)))
+
+(defn sinkable-freecell [freecells sinks]
+  (firstn
+    freecells
+    #(should-sink % sinks)))
+
+(defn sinkable-column [columns sinks]
+  (firstn
+    columns
+    #(should-sink (first %) sinks)))
+
 (reg-event-db
   :auto-sink
   (fn [db _]
     (update-card-state
       db
       (fn [{:keys [:columns :freecells :sinks] :as card-state}]
-        (if-let [n (some
-                     identity
-                     (for [i (range 4)]
-                       (when (should-sink (nth freecells i) sinks)
-                         i)))]
+        (if-let [n (sinkable-freecell freecells sinks)]
           (freecell-to-sink card-state n)
-          (when-let [n (some
-                         identity
-                         (for [i (range 8)]
-                           (when (should-sink
-                                   (first (nth columns i)) sinks)
-                             i)))]
+          (when-let [n (sinkable-column columns sinks)]
             (column-to-sink card-state n)))))))
