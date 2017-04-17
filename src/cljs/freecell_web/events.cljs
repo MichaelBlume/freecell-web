@@ -3,7 +3,8 @@
               [freecell-web.cards :refer
                [goes-on run-move sink can-sink should-sink]]
               [freecell-web.db :refer
-               [selected update-card-state init-state undo redo clear-ui]]))
+               [selected update-card-state init-state
+                undo redo clear-ui undoing]]))
 
 
 (reg-event-db
@@ -116,7 +117,7 @@
 (reg-event-db
   :auto-sink
   (fn [db _]
-    (if-not (selected db)
+    (if-not (or (selected db) (undoing db))
       (update-card-state
         db
         (fn [{:keys [:columns :freecells :sinks] :as card-state}]

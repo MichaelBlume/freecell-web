@@ -51,6 +51,9 @@
      :ui-state (init-ui)
      ::cards-state (first redo-states)}))
 
+(defn undoing [{:keys [::redo-states]}]
+  (seq redo-states))
+
 (reg-sub
  :game-state
  (fn [db]
