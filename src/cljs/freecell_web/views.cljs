@@ -77,10 +77,7 @@
     "New game"]
    [:button
     {:on-click #(dispatch [:redo])}
-    "Redo"]
-   [:button
-    {:on-click #(dispatch [:auto-sink])}
-    "Sink"]])
+    "Redo"]])
 
 (defn main-panel []
   [:div
@@ -89,3 +86,9 @@
    [columns]
    [bottom-row]
    ])
+
+(defn dispatch-timer-event []
+  (dispatch [:auto-sink]))
+
+(defonce do-timer
+  (js/setInterval dispatch-timer-event 250))
