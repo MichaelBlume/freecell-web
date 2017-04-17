@@ -65,7 +65,7 @@
          ^{:key i}
          [column i c])])))
 
-(defn bottom-row []
+(defn button-row []
   [:div
    {:style {:float :down}
     :class "bottom-row"}
@@ -82,9 +82,9 @@
 (defn main-panel []
   [:div
    {:class "freecell-game"}
+   [button-row]
    [top-row]
    [columns]
-   [bottom-row]
    ])
 
 (defn dispatch-timer-event []
