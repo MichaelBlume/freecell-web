@@ -12,7 +12,7 @@
 
 (def deck
   (into []
-    (for [suit [:spades :hearts :clubs :diamonds]
+    (for [suit suits
           n (range 1 14)]
       {:n n :suit suit})))
 
