@@ -114,15 +114,23 @@
     columns
     #(should-sink (first %) sinks)))
 
+(defn try-sink [db]
+  (if-not (or (selected db) (undoing db))
+    (update-card-state
+      db
+      (fn [{:keys [:columns :freecells :sinks] :as card-state}]
+        (if-let [n (sinkable-freecell freecells sinks)]
+          (freecell-to-sink card-state n)
+          (when-let [n (sinkable-column columns sinks)]
+            (column-to-sink card-state n)))))
+    db))
+
 (reg-event-db
   :auto-sink
   (fn [db _]
-    (if-not (or (selected db) (undoing db))
-      (update-card-state
-        db
-        (fn [{:keys [:columns :freecells :sinks] :as card-state}]
-          (if-let [n (sinkable-freecell freecells sinks)]
-            (freecell-to-sink card-state n)
-            (when-let [n (sinkable-column columns sinks)]
-              (column-to-sink card-state n)))))
-      db)))
+    (if (::tried-sink db)
+      db
+      (let [new-db (try-sink db)]
+        (if (= new-db db)
+          (assoc db ::tried-sink true)
+          new-db)))))
