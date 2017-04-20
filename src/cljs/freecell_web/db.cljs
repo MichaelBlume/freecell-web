@@ -26,16 +26,20 @@
        ::cards-state new-cs}
       (clear-ui db))))
 
+(defn init-cards
+  ([] (init-cards (shuffled-deck)))
+  ([deck]
+   {:columns (make-columns deck)
+    :freecells (into [] (repeat 4 nil))
+    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}}))
+
 (defn init-state
   ([] (init-state (shuffled-deck)))
   ([deck]
    {::undo-states nil
     ::redo-states nil
     :ui-state (init-ui)
-    ::cards-state
-    {:columns (make-columns deck)
-     :freecells (into [] (repeat 4 nil))
-     :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}}}))
+    ::cards-state (init-cards deck)}))
 
 (defn undo [{:keys [::undo-states ::redo-states ::cards-state] :as state}]
   (when (seq undo-states)

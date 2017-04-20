@@ -4,13 +4,15 @@
                [goes-on run-move sink can-sink should-sink]]
               [freecell-web.db :refer
                [selected update-card-state init-state
-                undo redo clear-ui undoing]]))
+                undo redo clear-ui undoing init-cards]]))
 
 
 (reg-event-db
  :initialize-db
- (fn  [_ _]
-   (init-state)))
+ (fn  [db _]
+   (if db
+     (update-card-state db (constantly (init-cards)))
+     (init-state))))
 
 (defn move-column [card-state on tn]
   (let [{:keys [columns freecells]} card-state
