@@ -16,7 +16,7 @@
 
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.9.3"]]
+   {:dependencies [[binaryage/devtools "0.9.4"]]
 
     :plugins      [[lein-figwheel "0.5.9"]]
     }}
