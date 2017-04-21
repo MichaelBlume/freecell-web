@@ -26,6 +26,7 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
 .card, .no-card {
     display: inline-block;
     width: 1.75em;
+    height: 1.5em;
     padding: 0.25em;
     margin: 0.25em; 
     text-align: center;
