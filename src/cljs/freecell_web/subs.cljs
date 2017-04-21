@@ -8,7 +8,7 @@
   :<- [:game-state]
   (fn [game-state _]
     (let [cs (:columns game-state)
-          longest (apply max (map count cs))]
+          longest (inc (apply max (map count cs)))]
       (for [c cs]
         (concat
           (repeat
