@@ -1,5 +1,6 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns]]
+            [cljs.reader :refer [read-string]]
             [re-frame.core :refer [reg-sub]]))
 
 (def default-db
@@ -16,7 +17,7 @@
 
 (defn get-object [k]
   (when-let [s (.getItem store k)]
-    (cljs.reader/read-string s)))
+    (read-string s)))
 
 (defn save-state [db]
   (store-object "freecell-state" db))
