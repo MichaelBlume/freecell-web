@@ -9,6 +9,18 @@
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
 
+(def store (.-sessionStorage js/window))
+
+(defn store-object [k obj]
+  (.setItem store k (prn-str obj)))
+
+(defn get-object [k]
+  (when-let [s (.getItem store k)]
+    (cljs.reader/read-string s)))
+
+(defn save-state [db]
+  (store-object "freecell-state" db))
+
 (defn clear-ui [state]
   (assoc-in state [:ui-state] (init-ui)))
 
@@ -34,7 +46,10 @@
     :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}}))
 
 (defn init-state
-  ([] (init-state (shuffled-deck)))
+  ([]
+   (if-let [saved (get-object "freecell-state")]
+     saved
+     (init-state (shuffled-deck))))
   ([deck]
    {::undo-states nil
     ::redo-states nil

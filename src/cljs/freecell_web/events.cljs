@@ -4,13 +4,14 @@
                [goes-on run-move sink can-sink should-sink]]
               [freecell-web.db :refer
                [selected update-card-state init-state
-                undo redo clear-ui undoing init-cards]]))
+                undo redo clear-ui undoing init-cards
+                save-state]]))
 
 
 (reg-event-db
  :initialize-db
  (fn  [db _]
-   (if db
+   (if (seq db)
      (update-card-state db (constantly (init-cards)))
      (init-state))))
 
@@ -136,3 +137,12 @@
         (if (= new-db db)
           (assoc db ::tried-sink true)
           new-db)))))
+
+(reg-event-db
+  :save-state
+  (fn [db _]
+    (if (::saved db)
+      db
+      (let [new-db (assoc db ::saved true)]
+        (save-state new-db)
+        new-db))))

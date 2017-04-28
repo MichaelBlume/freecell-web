@@ -92,3 +92,9 @@
 
 (defonce do-timer
   (js/setInterval dispatch-timer-event 250))
+
+(defn dispatch-save-timer-event []
+  (dispatch [:save-state]))
+
+(defonce save-timer
+  (js/setInterval dispatch-save-timer-event 5000))
