@@ -77,8 +77,9 @@
      ::cards-state (first redo-states)}))
 
 (defn reset [{:keys [::undo-states ::redo-states ::cards-state]}]
-  (let [rewound-over (take-while (complement ::new-game) undo-states)
-        new-undoes-and-start (drop-while (complement ::new-game) undo-states)]
+  (let [current-and-past (cons cards-state undo-states)
+        rewound-over (take-while (complement ::new-game) current-and-past)
+        new-undoes-and-start (drop-while (complement ::new-game) current-and-past)]
     {::undo-states (rest new-undoes-and-start)
      :ui-state (init-ui)
      ::cards-state (first new-undoes-and-start)
