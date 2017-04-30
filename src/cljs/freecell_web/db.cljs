@@ -76,6 +76,20 @@
      :ui-state (init-ui)
      ::cards-state (first redo-states)}))
 
+(defn reset [{:keys [::undo-states ::redo-states ::cards-state]}]
+  (let [rewound-over (take-while (complement ::new-game) undo-states)
+        new-undoes-and-start (drop-while (complement ::new-game) undo-states)]
+    {::undo-states (rest new-undoes-and-start)
+     :ui-state (init-ui)
+     ::cards-state (first new-undoes-and-start)
+     ::redo-states (concat (reverse rewound-over) redo-states)}))
+
+(defn redo-all [{:keys [::undo-states ::redo-states ::cards-state]}]
+  (let [current-and-future (cons cards-state redo-states)]
+    {::undo-states (concat undo-states (butlast current-and-future))
+     ::cards-state (last current-and-future)
+     ::redo-states nil}))
+
 (defn undoing [{:keys [::redo-states]}]
   (seq redo-states))
 
