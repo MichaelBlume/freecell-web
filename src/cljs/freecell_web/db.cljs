@@ -84,10 +84,10 @@
      ::redo-states (concat (reverse rewound-over) redo-states)}))
 
 (defn redo-all [{:keys [::undo-states ::redo-states ::cards-state]}]
-  (let [current-and-future (cons cards-state redo-states)]
-    {::undo-states (concat undo-states (butlast current-and-future))
-     ::cards-state (last current-and-future)
-     ::redo-states nil}))
+  (let [future-and-current (reverse (cons cards-state redo-state))]
+    {::undo-states (concat (rest future-and-current) undo-states)
+     ::cards-state (first future-and-current)
+     :redo-states nil}))
 
 (defn undoing [{:keys [::redo-states]}]
   (seq redo-states))
