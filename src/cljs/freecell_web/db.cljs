@@ -20,7 +20,7 @@
   (store-object "freecell-state" db))
 
 (defn clear-ui [state]
-  (assoc-in state [:ui-state] (init-ui)))
+  (assoc state :ui-state (init-ui)))
 
 (defn selected [state] (-> state :ui-state :selected))
 
