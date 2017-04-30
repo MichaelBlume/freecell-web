@@ -10,7 +10,7 @@
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
 
-(def store (.-sessionStorage js/window))
+(def store (.-localStorage js/window))
 
 (defn store-object [k obj]
   (.setItem store k (prn-str obj)))
@@ -29,11 +29,15 @@
 
 (defn selected-area [state] (-> state selected first))
 
+(defn winning? [card-state]
+  (= (:sinks card-state) {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
+
 (defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
 
-  (let [new-cs (f cards-state)]
+  (let [new-cs (f (assoc cards-state ::new-game false))]
     (if (and new-cs (not= new-cs cards-state))
-      {::undo-states (cons cards-state undo-states)
+      {::undo-states (when-not (winning? cards-state)
+                       (cons cards-state undo-states))
        ::redo-states nil
        :ui-state (init-ui)
        ::cards-state new-cs}
@@ -44,7 +48,8 @@
   ([deck]
    {:columns (make-columns deck)
     :freecells (into [] (repeat 4 nil))
-    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}}))
+    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}
+    ::new-game true}))
 
 (defn init-state
   ([]
@@ -64,12 +69,26 @@
      :ui-state (init-ui)
      ::cards-state (first undo-states)}))
 
-(defn redo [{:keys [::undo-states ::redo-states ::cards-state] :as state}]
+(defn redo [{:keys [::undo-states ::redo-states ::cards-state]}]
   (when (seq redo-states)
     {::undo-states (cons cards-state undo-states)
      ::redo-states (rest redo-states)
      :ui-state (init-ui)
      ::cards-state (first redo-states)}))
+
+(defn reset [{:keys [::undo-states ::redo-states ::cards-state]}]
+  (let [rewound-over (take-while (complement ::new-game) undo-states)
+        new-undoes-and-start (drop-while (complement ::new-game) undo-states)]
+    {::undo-states (rest new-undoes-and-start)
+     :ui-state (init-ui)
+     ::cards-state (first new-undoes-and-start)
+     ::redo-states (concat (reverse rewound-over) redo-states)}))
+
+(defn redo-all [{:keys [::undo-states ::redo-states ::cards-state]}]
+  (let [current-and-future (cons cards-state redo-states)]
+    {::undo-states (concat undo-states (butlast current-and-future))
+     ::cards-state (last current-and-future)
+     ::redo-states nil}))
 
 (defn undoing [{:keys [::redo-states]}]
   (seq redo-states))

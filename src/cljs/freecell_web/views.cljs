@@ -70,6 +70,9 @@
    {:style {:float :down}
     :class "bottom-row"}
    [:button
+    {:on-click #(dispatch [:reset])}
+    "Reset"]
+   [:button
     {:on-click #(dispatch [:undo])}
     "Undo"]
    [:button
@@ -77,7 +80,10 @@
     "New game"]
    [:button
     {:on-click #(dispatch [:redo])}
-    "Redo"]])
+    "Redo"]
+   [:button
+    {:on-click #(dispatch [:redo-all])}
+    "Redo All"]])
 
 (defn main-panel []
   [:div

@@ -5,7 +5,7 @@
               [freecell-web.db :refer
                [selected update-card-state init-state
                 undo redo clear-ui undoing init-cards
-                save-state]]))
+                save-state reset redo-all]]))
 
 
 (reg-event-db
@@ -146,3 +146,10 @@
       (let [new-db (assoc db ::saved true)]
         (save-state new-db)
         new-db))))
+
+(reg-event-db
+  :reset
+  (fn [db _]
+    (reset db)))
+
+(reg-event-db :redo-all (fn [db _] (redo-all db)))
