@@ -34,7 +34,7 @@
 
 (defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
 
-  (let [new-cs (f cards-state)]
+  (let [new-cs (f (assoc cards-state ::new-game false))]
     (if (and new-cs (not= new-cs cards-state))
       {::undo-states (when-not (winning? cards-state)
                        (cons cards-state undo-states))
@@ -48,7 +48,8 @@
   ([deck]
    {:columns (make-columns deck)
     :freecells (into [] (repeat 4 nil))
-    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}}))
+    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}
+    ::new-game true}))
 
 (defn init-state
   ([]
