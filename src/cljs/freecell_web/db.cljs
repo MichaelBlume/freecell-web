@@ -3,9 +3,6 @@
             [cljs.reader :refer [read-string]]
             [re-frame.core :refer [reg-sub]]))
 
-(def default-db
-  {:name "re-frame"})
-
 (defn init-ui []
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
