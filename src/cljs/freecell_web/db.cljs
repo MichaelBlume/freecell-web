@@ -27,7 +27,8 @@
 (defn selected-area [state] (-> state selected first))
 
 (defn winning? [card-state]
-  (= (:sinks card-state) {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
+  (= (:sinks card-state)
+     {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
 
 (defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
 
