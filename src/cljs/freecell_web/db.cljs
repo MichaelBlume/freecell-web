@@ -3,9 +3,6 @@
             [cljs.reader :refer [read-string]]
             [re-frame.core :refer [reg-sub]]))
 
-(def default-db
-  {:name "re-frame"})
-
 (defn init-ui []
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
@@ -23,14 +20,15 @@
   (store-object "freecell-state" db))
 
 (defn clear-ui [state]
-  (assoc-in state [:ui-state] (init-ui)))
+  (assoc state :ui-state (init-ui)))
 
 (defn selected [state] (-> state :ui-state :selected))
 
 (defn selected-area [state] (-> state selected first))
 
 (defn winning? [card-state]
-  (= (:sinks card-state) {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
+  (= (:sinks card-state)
+     {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
 
 (defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
 
@@ -86,10 +84,10 @@
      ::redo-states (concat (reverse rewound-over) redo-states)}))
 
 (defn redo-all [{:keys [::undo-states ::redo-states ::cards-state]}]
-  (let [current-and-future (cons cards-state redo-states)]
-    {::undo-states (concat undo-states (butlast current-and-future))
-     ::cards-state (last current-and-future)
-     ::redo-states nil}))
+  (let [future-and-current (reverse (cons cards-state redo-state))]
+    {::undo-states (concat (rest future-and-current) undo-states)
+     ::cards-state (first future-and-current)
+     :redo-states nil}))
 
 (defn undoing [{:keys [::redo-states]}]
   (seq redo-states))
