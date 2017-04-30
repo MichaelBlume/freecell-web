@@ -10,7 +10,7 @@
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
 
-(def store (.-sessionStorage js/window))
+(def store (.-localStorage js/window))
 
 (defn store-object [k obj]
   (.setItem store k (prn-str obj)))
