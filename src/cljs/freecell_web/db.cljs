@@ -69,7 +69,7 @@
      :ui-state (init-ui)
      ::cards-state (first undo-states)}))
 
-(defn redo [{:keys [::undo-states ::redo-states ::cards-state] :as state}]
+(defn redo [{:keys [::undo-states ::redo-states ::cards-state]}]
   (when (seq redo-states)
     {::undo-states (cons cards-state undo-states)
      ::redo-states (rest redo-states)
