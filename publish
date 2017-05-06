@@ -1,9 +1,11 @@
-git pull
-git clean -fxd
+git fetch
+git merge origin/master
 lein cljsbuild once min
-cp resources/public/js/compiled/app.js ../michaelblume.github.io/js/compiled/app.js
-cp resources/public/css/styles.css ../michaelblume.github.io/css/styles.css
-cd ../michaelblume.github.io
-git add .
-git commit -m "update"
+mkdir -p js/compiled
+mkdir -p css
+cp resources/public/js/compiled/app.js js/compiled/app.js
+cp resources/public/css/styles.css css/styles.css
+cp resources/public/index.html index.html
+git add js css index.html
+git commit --amend
 git push
