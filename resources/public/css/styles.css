@@ -69,3 +69,7 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
     background-color: #c0c0ff;
     border-radius: 0.4em;
 }
+
+.debug-panel {
+  overflow: auto;
+}

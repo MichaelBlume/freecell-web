@@ -85,12 +85,20 @@
     {:on-click #(dispatch [:redo-all])}
     "Redo All"]])
 
+(defn debug []
+  (let [ds (subscribe [:debug])]
+    (fn []
+      [:div
+       {:class "debug-panel"}
+       [:pre @ds]])))
+
 (defn main-panel []
   [:div
    {:class "freecell-game"}
    [button-row]
    [top-row]
    [columns]
+   [debug]
    ])
 
 (defn dispatch-timer-event []
