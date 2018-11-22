@@ -1,5 +1,6 @@
 (ns freecell-web.subs
-    (:require [re-frame.core :refer [reg-sub]]
+    (:require [cljs.pprint :refer [pprint]]
+              [re-frame.core :refer [reg-sub]]
               [freecell-web.cards :refer [suits]]
               [freecell-web.db :refer [selected]]))
 
@@ -35,3 +36,10 @@
     (for [suit suits]
       (let [n (-> game-state :sinks suit)]
         {:suit suit :n n}))))
+
+(reg-sub
+  :debug
+  :<- [:game-state]
+  (fn [game-state _]
+    (with-out-str
+      (pprint game-state))))
