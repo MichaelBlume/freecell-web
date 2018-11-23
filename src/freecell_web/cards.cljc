@@ -113,3 +113,7 @@
       (and
         (<= (- (:n card) (min-sink sinks)) 3)
         (<= (- (:n card) (min-opposite-sink card sinks)) 2)))))
+
+(defn winning? [card-state]
+  (= (:sinks card-state)
+     {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
