@@ -8,7 +8,7 @@
 
   :min-lein-version "2.5.3"
 
-  :source-paths ["src/clj"]
+  :source-paths ["src"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
@@ -24,7 +24,7 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["src/cljs"]
+     :source-paths ["src"]
      :figwheel     {:on-jsload "freecell-web.core/mount-root"}
      :compiler     {:main                 freecell-web.core
                     :output-to            "resources/public/js/compiled/app.js"
@@ -36,7 +36,7 @@
                     }}
 
     {:id           "min"
-     :source-paths ["src/cljs"]
+     :source-paths ["src"]
      :compiler     {:main            freecell-web.core
                     :output-to       "resources/public/js/compiled/app.js"
                     :optimizations   :advanced
