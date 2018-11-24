@@ -1,12 +1,12 @@
 (ns freecell-web.cards)
 
-(def suits [:spades :hearts :clubs :diamonds])
-
 (def colors
   {:spades :black
    :hearts :red
    :clubs :black
    :diamonds :red})
+
+(def suits (keys colors))
 
 (defn color [card] (-> card :suit colors))
 
