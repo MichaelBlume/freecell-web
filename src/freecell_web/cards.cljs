@@ -47,12 +47,17 @@
     reverse
     (into [])))
 
+(defn safe-inc [n]
+  (if n
+    (inc n)
+    1))
+
 (defn goes-on [card on]
   (or
     (nil? on)
     (and
       (not (= (color card) (color on)))
-      (= (:n on) (inc (:n card))))))
+      (= (:n on) (safe-inc (:n card))))))
 
 (defn moveable-subset [column]
   (when (seq column)
@@ -78,7 +83,7 @@
           (assoc to new-to)))))
 
 (defn can-sink [card sinks]
-  (= (:n card) (inc (sinks (:suit card)))))
+  (= (:n card) (safe-inc (sinks (:suit card)))))
 
 (defn sink [card sinks]
   (assoc sinks (:suit card) (:n card)))
