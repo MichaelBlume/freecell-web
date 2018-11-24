@@ -94,7 +94,7 @@
           (assoc to new-to)))))
 
 (defn can-sink [card sinks]
-  (= (:n card) (safe-inc (sinks (:suit card)))))
+  (= (:n card) (safe-inc (get sinks (:suit card)))))
 
 (defn sink [card sinks]
   (assoc sinks (:suit card) (:n card)))
