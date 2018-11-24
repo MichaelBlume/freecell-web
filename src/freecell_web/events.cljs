@@ -2,10 +2,11 @@
     (:require [re-frame.core :refer [reg-event-db]]
               [freecell-web.moves :refer
                [move-column freecell-to-column column-to-freecell column-to-sink freecell-to-sink autosink]]
+              [freecell-web.storage :refer [get-object save-state]]
               [freecell-web.db :refer
                [selected update-card-state init-state
                 undo redo clear-ui undoing init-cards
-                save-state reset redo-all]]))
+                reset redo-all]]))
 
 
 (reg-event-db
@@ -13,7 +14,7 @@
  (fn  [db _]
    (if (seq db)
      (update-card-state db (constantly (init-cards)))
-     (init-state))))
+     (init-state (get-object "freecell-state")))))
 
 (reg-event-db
   :click-column

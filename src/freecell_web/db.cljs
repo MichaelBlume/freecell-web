@@ -1,23 +1,10 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
-            [cljs.reader :refer [read-string]]
             [re-frame.core :refer [reg-sub]]))
 
 (defn init-ui []
   ; three possible states -- nil, [:column n], [:freecell n]
   {:selected nil})
-
-(def store (.-localStorage js/window))
-
-(defn store-object [k obj]
-  (.setItem store k (prn-str obj)))
-
-(defn get-object [k]
-  (when-let [s (.getItem store k)]
-    (read-string s)))
-
-(defn save-state [db]
-  (store-object "freecell-state" db))
 
 (defn clear-ui [state]
   (assoc state :ui-state (init-ui)))
@@ -46,15 +33,13 @@
     ::new-game true}))
 
 (defn init-state
-  ([]
-   (if-let [saved (get-object "freecell-state")]
-     saved
-     (init-state (shuffled-deck))))
-  ([deck]
-   {::undo-states nil
-    ::redo-states nil
-    :ui-state (init-ui)
-    ::cards-state (init-cards deck)}))
+  [saved]
+  (if saved
+    saved
+    {::undo-states nil
+     ::redo-states nil
+     :ui-state (init-ui)
+     ::cards-state (init-cards (shuffled-deck))}))
 
 (defn undo [{:keys [::undo-states ::redo-states ::cards-state] :as state}]
   (when (seq undo-states)
