@@ -1,4 +1,5 @@
-(ns freecell-web.cards)
+(ns freecell-web.cards
+  #?@(:cljs [(:require [cljs.reader :refer [register-tag-parser!]])]))
 
 (def colors
   {:spades :black
@@ -11,6 +12,8 @@
 (defn color [card] (-> card :suit colors))
 
 (defrecord Card [n suit])
+
+#?(:cljs (register-tag-parser! 'freecell-web.cards.Card map->Card))
 
 (def deck
   (into []
