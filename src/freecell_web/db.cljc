@@ -1,6 +1,7 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
-            [re-frame.core :refer [reg-sub]]))
+            [re-frame.core :refer [reg-sub]]
+            #?@(:cljs [[cljs.reader :refer [register-tag-parser!]]])))
 
 (defn init-ui []
   ; three possible states -- nil, [:column n], [:freecell n]
@@ -24,13 +25,21 @@
        ::cards-state new-cs}
       (clear-ui db))))
 
+(defrecord CardsState [columns freecells sinks])
+
+(defrecord Sinks [spades clubs diamonds hearts])
+
+#?(:cljs (register-tag-parser! 'freecell-web.db.CardsState map->CardsState))
+#?(:cljs (register-tag-parser! 'freecell-web.db.Sinks map->Sinks))
+
 (defn init-cards
   ([] (init-cards (shuffled-deck)))
   ([deck]
-   {:columns (make-columns deck)
-    :freecells (into [] (repeat 4 nil))
-    :sinks {:spades 0 :clubs 0 :diamonds 0 :hearts 0}
-    ::new-game true}))
+    (map->CardsState
+      {:columns (make-columns deck)
+       :freecells (into [] (repeat 4 nil))
+       :sinks (->Sinks 0 0 0 0)
+       ::new-game true})))
 
 (defn init-state
   [saved]

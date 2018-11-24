@@ -1,5 +1,7 @@
 (ns freecell-web.storage
-  (:require [cljs.reader :refer [read-string]]))
+  (:require [cljs.reader :refer [read-string]]
+            freecell-web.cards
+            freecell-web.db))
 
 (def store (.-localStorage js/window))
 
