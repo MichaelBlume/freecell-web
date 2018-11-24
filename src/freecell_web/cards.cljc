@@ -66,10 +66,16 @@
 
 (defn moveable-subset [column]
   (when (seq column)
-    (cons
-      (first column)
-      (when (goes-on (first column) (second column))
-        (moveable-subset (rest column))))))
+    (loop [subset [(first column)]
+           card (first column)
+           remaining (rest column)]
+      (let [next-card (first remaining)]
+        (if (and next-card (goes-on card next-card))
+          (recur
+            (conj subset next-card)
+            next-card
+            (rest remaining))
+          subset)))))
 
 (defn move-column [from to moveable]
   (let [moveable-cards (take moveable (moveable-subset from))]
