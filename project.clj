@@ -14,6 +14,11 @@
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
+  :cljfmt {:indents
+           {require [[:block 0]]
+            ns [[:block 0]]
+            #"^(?!:require|:import).*" [[:inner 0]]}}
+
   :profiles
   {:dev
    {:dependencies [[binaryage/devtools "0.9.4"]]
