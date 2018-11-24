@@ -10,11 +10,13 @@
 
 (defn color [card] (-> card :suit colors))
 
+(defrecord Card [n suit])
+
 (def deck
   (into []
     (for [suit suits
           n (range 1 14)]
-      {:n n :suit suit})))
+      (map->Card {:n n :suit suit}))))
 
 (defn shuffled-deck [] (shuffle deck))
 
