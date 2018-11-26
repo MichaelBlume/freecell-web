@@ -1,6 +1,5 @@
-(ns freecell-web.cards)
-
-(def suits [:spades :hearts :clubs :diamonds])
+(ns freecell-web.cards
+  #?@(:cljs [(:require [cljs.reader :refer [register-tag-parser!]])]))
 
 (def colors
   {:spades :black
@@ -8,13 +7,19 @@
    :clubs :black
    :diamonds :red})
 
+(def suits (keys colors))
+
 (defn color [card] (-> card :suit colors))
+
+(defrecord Card [n suit])
+
+#?(:cljs (register-tag-parser! 'freecell-web.cards.Card map->Card))
 
 (def deck
   (into []
     (for [suit suits
           n (range 1 14)]
-      {:n n :suit suit})))
+      (map->Card {:n n :suit suit}))))
 
 (defn shuffled-deck [] (shuffle deck))
 
@@ -47,19 +52,30 @@
     reverse
     (into [])))
 
+(defn safe-inc [n]
+  (if n
+    (inc n)
+    1))
+
 (defn goes-on [card on]
   (or
     (nil? on)
     (and
       (not (= (color card) (color on)))
-      (= (:n on) (inc (:n card))))))
+      (= (:n on) (safe-inc (:n card))))))
 
 (defn moveable-subset [column]
   (when (seq column)
-    (cons
-      (first column)
-      (when (goes-on (first column) (second column))
-        (moveable-subset (rest column))))))
+    (loop [subset [(first column)]
+           card (first column)
+           remaining (rest column)]
+      (let [next-card (first remaining)]
+        (if (and next-card (goes-on card next-card))
+          (recur
+            (conj subset next-card)
+            next-card
+            (rest remaining))
+          subset)))))
 
 (defn move-column [from to moveable]
   (let [moveable-cards (take moveable (moveable-subset from))]
@@ -78,7 +94,7 @@
           (assoc to new-to)))))
 
 (defn can-sink [card sinks]
-  (= (:n card) (inc (sinks (:suit card)))))
+  (= (:n card) (safe-inc (get sinks (:suit card)))))
 
 (defn sink [card sinks]
   (assoc sinks (:suit card) (:n card)))
@@ -108,3 +124,7 @@
       (and
         (<= (- (:n card) (min-sink sinks)) 3)
         (<= (- (:n card) (min-opposite-sink card sinks)) 2)))))
+
+(defn winning? [card-state]
+  (= (:sinks card-state)
+     {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
