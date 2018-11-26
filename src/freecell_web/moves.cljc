@@ -74,3 +74,20 @@
     (freecell-to-sink card-state n)
     (when-let [n (sinkable-column columns sinks)]
       (column-to-sink card-state n))))
+
+(defn reachable-states [card-state]
+  (filter
+   identity
+   (concat
+    (for [fcn (range 4)
+          cn (range 8)]
+      (freecell-to-column card-state fcn cn))
+    (for [on (range 8)
+          tn (range 8)]
+      (move-column card-state on tn))
+    (for [cn (range 8)]
+      (column-to-first-freecell card-state cn))
+    (for [n (range 4)]
+      (freecell-to-sink card-state n))
+    (for [n (range 8)]
+      (column-to-sink card-state n)))))

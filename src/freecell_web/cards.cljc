@@ -78,6 +78,7 @@
           subset)))))
 
 (defn move-column [from to moveable]
+  (dorun from)
   (let [moveable-cards (take moveable (moveable-subset from))]
     (some identity
       (for [i (range (count moveable-cards) 0 -1)]
@@ -90,8 +91,8 @@
         to-col (nth columns to)]
     (when-let [[new-from new-to] (move-column from-col to-col moveable)]
       (-> columns
-          (assoc from new-from)
-          (assoc to new-to)))))
+        (assoc from new-from)
+        (assoc to new-to)))))
 
 (defn can-sink [card sinks]
   (= (:n card) (safe-inc (get sinks (:suit card)))))
@@ -127,4 +128,4 @@
 
 (defn winning? [card-state]
   (= (:sinks card-state)
-     {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))
+    {:spades 13 :clubs 13 :diamonds 13 :hearts 13}))

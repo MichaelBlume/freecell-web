@@ -15,7 +15,6 @@
 (defn selected-area [state] (-> state selected first))
 
 (defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
-
   (let [new-cs (f (assoc cards-state ::new-game false))]
     (if (and new-cs (not= new-cs cards-state))
       {::undo-states (when-not (winning? cards-state)
@@ -83,6 +82,6 @@
   (seq redo-states))
 
 (reg-sub
- :game-state
- (fn [db]
-   (::cards-state db)))
+  :game-state
+  (fn [db]
+    (::cards-state db)))
