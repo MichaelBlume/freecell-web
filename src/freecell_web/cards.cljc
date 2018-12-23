@@ -91,8 +91,8 @@
         movable (if (seq to-col) movable-to-column movable-to-empty)]
     (when-let [[new-from new-to] (move-column from-col to-col movable)]
       (-> columns
-          (assoc from new-from)
-          (assoc to new-to)))))
+        (assoc from new-from)
+        (assoc to new-to)))))
 
 (defn can-sink [card sinks]
   (= (:n card) (safe-inc (get sinks (:suit card)))))

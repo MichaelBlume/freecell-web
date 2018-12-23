@@ -21,8 +21,8 @@
         tc (first col)]
     (when (and mc (goes-on mc tc))
       (-> card-state
-          (update-in [:columns cn] #(cons mc %))
-          (assoc-in [:freecells fcn] nil)))))
+        (update-in [:columns cn] #(cons mc %))
+        (assoc-in [:freecells fcn] nil)))))
 
 (defn column-to-freecell [card-state cn fcn]
   (let [{:keys [columns freecells]} card-state
@@ -31,14 +31,14 @@
         fcc (nth freecells fcn)]
     (when (and mc (not fcc))
       (-> card-state
-          (update-in [:columns cn] rest)
-          (assoc-in [:freecells fcn] mc)))))
+        (update-in [:columns cn] rest)
+        (assoc-in [:freecells fcn] mc)))))
 
 (defn column-to-first-freecell [card-state cn]
   (some
-   identity
-   (for [fcn (range 4)]
-     (column-to-freecell card-state cn fcn))))
+    identity
+    (for [fcn (range 4)]
+      (column-to-freecell card-state cn fcn))))
 
 (defn column-to-sink [card-state n]
   (let [{:keys [columns sinks]} card-state
@@ -46,31 +46,31 @@
         card (first col)]
     (when (and card (can-sink card sinks))
       (-> card-state
-          (update-in [:columns n] rest)
-          (update-in [:sinks] #(sink card %))))))
+        (update-in [:columns n] rest)
+        (update-in [:sinks] #(sink card %))))))
 
 (defn freecell-to-sink [card-state n]
   (let [{:keys [freecells sinks]} card-state
         card (nth freecells n)]
     (when (and card (can-sink card sinks))
       (-> card-state
-          (assoc-in [:freecells n] nil)
-          (update-in [:sinks] #(sink card %))))))
+        (assoc-in [:freecells n] nil)
+        (update-in [:sinks] #(sink card %))))))
 
 (defn firstn [s pred]
   (some
-   identity
-   (map-indexed (fn [i x] (when (pred x) i)) s)))
+    identity
+    (map-indexed (fn [i x] (when (pred x) i)) s)))
 
 (defn sinkable-freecell [freecells sinks]
   (firstn
-   freecells
-   #(should-sink % sinks)))
+    freecells
+    #(should-sink % sinks)))
 
 (defn sinkable-column [columns sinks]
   (firstn
-   columns
-   #(should-sink (first %) sinks)))
+    columns
+    #(should-sink (first %) sinks)))
 
 (defn autosink [{:keys [:columns :freecells :sinks] :as card-state}]
   (if-let [n (sinkable-freecell freecells sinks)]
