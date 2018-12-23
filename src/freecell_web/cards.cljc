@@ -42,6 +42,8 @@
 
 (defn flip [vs] (apply map vector vs))
 
+(declare make-fast-column)
+
 (defn make-columns [deck]
   (->>
     deck
@@ -49,6 +51,7 @@
     (partition 8)
     flip
     (map #(filter identity %))
+    (map make-fast-column)
     reverse
     (into [])))
 
@@ -87,6 +90,36 @@
             (rest remaining))
           subset)))))
 
+(defrecord FastColumn [movable immovable]
+  Column
+  (get-all-cards [this]
+    (concat movable immovable))
+  (has-cards? [this]
+    (seq movable))
+  (top-card [this]
+    (first movable))
+  (movable-subset [this]
+    movable)
+  (put-card [this card]
+    (FastColumn. (cons card movable) immovable))
+  (put-cards [this cards]
+    (FastColumn. (concat cards movable) immovable))
+  (drop-card [this]
+    (case (count movable)
+      0 (FastColumn. nil nil)
+      1 (make-fast-column immovable)
+      (FastColumn. (rest movable) immovable)))
+  (drop-cards [this n]
+    (let [mcount (count movable)]
+      (if (>= n mcount)
+        (make-fast-column (drop (- n mcount) immovable))
+        (FastColumn. (drop n movable) immovable)))))
+
+(defn make-fast-column [cards]
+  (let [movable (movable-subset* cards)
+        immovable (drop (count movable) cards)]
+    (->FastColumn movable immovable)))
+
 (extend-protocol Column
   nil
   (get-all-cards [this]
@@ -98,13 +131,13 @@
   (movable-subset [this]
     nil)
   (put-card [this card]
-    (cons card nil))
+    (->FastColumn [card] nil))
   (put-cards [this new-cards]
-    new-cards)
+    (->FastColumn new-cards nil))
   (drop-card [this]
-    nil)
+    (->FastColumn nil nil))
   (drop-cards [this n]
-    nil)
+    (->FastColumn nil nil))
   #?(:clj Object :cljs default)
   (get-all-cards [this]
     this)
@@ -115,13 +148,19 @@
   (movable-subset [this]
     (movable-subset* this))
   (put-card [this card]
-    (cons card this))
+    (make-fast-column
+      (cons card this)))
   (put-cards [this new-cards]
-    (concat new-cards this))
+    (make-fast-column
+      (concat new-cards this)))
   (drop-card [this]
-    (rest this))
+    (make-fast-column
+      (rest this)))
   (drop-cards [this n]
-    (drop n this)))
+    (make-fast-column
+      (drop n this))))
+
+#?(:cljs (register-tag-parser! 'freecell-web.cards.FastColumn map->FastColumn))
 
 (defn move-column [from to movable]
   (let [movable-cards (take movable (movable-subset from))]
