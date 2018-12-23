@@ -64,7 +64,7 @@
       (not (= (color card) (color on)))
       (= (:n on) (safe-inc (:n card))))))
 
-(defn moveable-subset [column]
+(defn movable-subset [column]
   (when (seq column)
     (loop [subset [(first column)]
            card (first column)
@@ -77,19 +77,19 @@
             (rest remaining))
           subset)))))
 
-(defn move-column [from to moveable]
-  (let [moveable-cards (take moveable (moveable-subset from))]
+(defn move-column [from to movable]
+  (let [movable-cards (take movable (movable-subset from))]
     (some identity
-      (for [i (range (count moveable-cards) 0 -1)]
-        (let [to-move (take i moveable-cards)]
+      (for [i (range (count movable-cards) 0 -1)]
+        (let [to-move (take i movable-cards)]
           (when (goes-on (last to-move) (first to))
             [(drop i from) (concat to-move to) i]))))))
 
-(defn run-move [columns from to moveable-to-column moveable-to-empty]
+(defn run-move [columns from to movable-to-column movable-to-empty]
   (let [from-col (nth columns from)
         to-col (nth columns to)
-        moveable (if (seq to-col) moveable-to-column moveable-to-empty)]
-    (when-let [[new-from new-to] (move-column from-col to-col moveable)]
+        movable (if (seq to-col) movable-to-column movable-to-empty)]
+    (when-let [[new-from new-to] (move-column from-col to-col movable)]
       (-> columns
           (assoc from new-from)
           (assoc to new-to)))))

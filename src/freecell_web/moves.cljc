@@ -8,9 +8,9 @@
     (let [{:keys [columns freecells]} card-state
           empty-count (count (filter not freecells))
           empty-column-count (count (remove seq columns))
-          moveable-to-column (* (inc empty-column-count) (inc empty-count))
-          moveable-to-empty (* empty-column-count (inc empty-count))
-          new-columns (run-move columns on tn moveable-to-column moveable-to-empty)]
+          movable-to-column (* (inc empty-column-count) (inc empty-count))
+          movable-to-empty (* empty-column-count (inc empty-count))
+          new-columns (run-move columns on tn movable-to-column movable-to-empty)]
       (when new-columns
         (assoc card-state :columns new-columns)))))
 
