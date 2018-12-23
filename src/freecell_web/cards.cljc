@@ -129,7 +129,7 @@
       (for [i (range (count movable-cards) 0 -1)]
         (let [to-move (take i movable-cards)]
           (when (goes-on (last to-move) (top-card to))
-            [(drop-cards from i) (put-cards to to-move) i]))))))
+            [(drop-cards from i) (put-cards to to-move)]))))))
 
 (defn run-move [columns from to movable-to-column movable-to-empty]
   (let [from-col (nth columns from)
