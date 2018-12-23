@@ -85,9 +85,10 @@
           (when (goes-on (last to-move) (first to))
             [(drop i from) (concat to-move to) i]))))))
 
-(defn run-move [columns from to moveable]
+(defn run-move [columns from to moveable-to-column moveable-to-empty]
   (let [from-col (nth columns from)
-        to-col (nth columns to)]
+        to-col (nth columns to)
+        moveable (if (seq to-col) moveable-to-column moveable-to-empty)]
     (when-let [[new-from new-to] (move-column from-col to-col moveable)]
       (-> columns
           (assoc from new-from)

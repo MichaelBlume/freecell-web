@@ -7,7 +7,10 @@
   (when (not= on tn)
     (let [{:keys [columns freecells]} card-state
           empty-count (count (filter not freecells))
-          new-columns (run-move columns on tn (inc empty-count))]
+          empty-column-count (count (remove seq columns))
+          moveable-to-column (* (inc empty-column-count) (inc empty-count))
+          moveable-to-empty (* empty-column-count (inc empty-count))
+          new-columns (run-move columns on tn moveable-to-column moveable-to-empty)]
       (when new-columns
         (assoc card-state :columns new-columns)))))
 
