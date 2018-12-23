@@ -42,6 +42,8 @@
 
 (defn flip [vs] (apply map vector vs))
 
+(declare make-fast-column)
+
 (defn make-columns [deck]
   (->>
     deck
@@ -49,8 +51,19 @@
     (partition 8)
     flip
     (map #(filter identity %))
+    (map make-fast-column)
     reverse
     (into [])))
+
+(defprotocol Column
+  (get-all-cards [this])
+  (has-cards? [this])
+  (top-card [this])
+  (movable-subset [this])
+  (put-card [this card])
+  (put-cards [this new-cards])
+  (drop-card [this])
+  (drop-cards [this n]))
 
 (defn safe-inc [n]
   (if n
@@ -64,7 +77,7 @@
       (not (= (color card) (color on)))
       (= (:n on) (safe-inc (:n card))))))
 
-(defn moveable-subset [column]
+(defn- movable-subset* [column]
   (when (seq column)
     (loop [subset [(first column)]
            card (first column)
@@ -77,21 +90,94 @@
             (rest remaining))
           subset)))))
 
-(defn move-column [from to moveable]
-  (let [moveable-cards (take moveable (moveable-subset from))]
-    (some identity
-      (for [i (range (count moveable-cards) 0 -1)]
-        (let [to-move (take i moveable-cards)]
-          (when (goes-on (last to-move) (first to))
-            [(drop i from) (concat to-move to) i]))))))
+(defrecord FastColumn [movable immovable]
+  Column
+  (get-all-cards [this]
+    (concat movable immovable))
+  (has-cards? [this]
+    (seq movable))
+  (top-card [this]
+    (first movable))
+  (movable-subset [this]
+    movable)
+  (put-card [this card]
+    (FastColumn. (cons card movable) immovable))
+  (put-cards [this cards]
+    (FastColumn. (concat cards movable) immovable))
+  (drop-card [this]
+    (case (count movable)
+      0 (FastColumn. nil nil)
+      1 (make-fast-column immovable)
+      (FastColumn. (rest movable) immovable)))
+  (drop-cards [this n]
+    (let [mcount (count movable)]
+      (if (>= n mcount)
+        (make-fast-column (drop (- n mcount) immovable))
+        (FastColumn. (drop n movable) immovable)))))
 
-(defn run-move [columns from to moveable]
+(defn make-fast-column [cards]
+  (let [movable (movable-subset* cards)
+        immovable (drop (count movable) cards)]
+    (->FastColumn movable immovable)))
+
+(extend-protocol Column
+  nil
+  (get-all-cards [this]
+    nil)
+  (has-cards? [this]
+    false)
+  (top-card [this]
+    nil)
+  (movable-subset [this]
+    nil)
+  (put-card [this card]
+    (->FastColumn [card] nil))
+  (put-cards [this new-cards]
+    (->FastColumn new-cards nil))
+  (drop-card [this]
+    (->FastColumn nil nil))
+  (drop-cards [this n]
+    (->FastColumn nil nil))
+  #?(:clj Object :cljs default)
+  (get-all-cards [this]
+    this)
+  (has-cards? [this]
+    (seq this))
+  (top-card [this]
+    (first this))
+  (movable-subset [this]
+    (movable-subset* this))
+  (put-card [this card]
+    (make-fast-column
+      (cons card this)))
+  (put-cards [this new-cards]
+    (make-fast-column
+      (concat new-cards this)))
+  (drop-card [this]
+    (make-fast-column
+      (rest this)))
+  (drop-cards [this n]
+    (make-fast-column
+      (drop n this))))
+
+#?(:cljs (register-tag-parser! 'freecell-web.cards.FastColumn map->FastColumn))
+
+(defn move-column [from to movable]
+  (let [movable-cards (take movable (movable-subset from))]
+    (some identity
+      (for [i (range (count movable-cards) 0 -1)]
+        (let [to-move (take i movable-cards)]
+          (when (goes-on (last to-move) (top-card to))
+            [(drop-cards from i) (put-cards to to-move)]))))))
+
+(defn run-move [columns from to movable-to-column movable-to-empty]
   (let [from-col (nth columns from)
-        to-col (nth columns to)]
-    (when-let [[new-from new-to] (move-column from-col to-col moveable)]
+        to-col (nth columns to)
+        movable (if (has-cards? to-col) movable-to-column movable-to-empty)]
+    (when-let [[new-from new-to] (move-column from-col to-col movable)]
       (-> columns
-          (assoc from new-from)
-          (assoc to new-to)))))
+        (assoc from new-from)
+        (assoc to new-to)))))
 
 (defn can-sink [card sinks]
   (= (:n card) (safe-inc (get sinks (:suit card)))))

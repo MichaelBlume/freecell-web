@@ -1,9 +1,9 @@
 (ns freecell-web.views
-    (:require [re-frame.core :refer [subscribe dispatch]]
-              [cljs.pprint :refer [pprint]]
-              [clojure.string :refer [join]]
-              [freecell-web.subs]
-              [freecell-web.cards :refer [display-string color]]))
+  (:require [re-frame.core :refer [subscribe dispatch]]
+            [cljs.pprint :refer [pprint]]
+            [clojure.string :refer [join]]
+            [freecell-web.subs]
+            [freecell-web.cards :refer [display-string color]]))
 
 (defn classes [& cs]
   (join \space (map name (filter identity cs))))
@@ -11,10 +11,10 @@
 (defn card [c location & [on-click]]
   [:span
    {:class
-     (if c
-       (classes
-         (color c) (:suit c) (str "n" (:n c)) location "card")
-       (classes "no-card" location))
+    (if c
+      (classes
+        (color c) (:suit c) (str "n" (:n c)) location "card")
+      (classes "no-card" location))
     :on-click on-click}
    (display-string c)])
 
@@ -98,8 +98,7 @@
    [button-row]
    [top-row]
    [columns]
-   [debug]
-   ])
+   [debug]])
 
 (defn dispatch-timer-event []
   (dispatch [:auto-sink]))
