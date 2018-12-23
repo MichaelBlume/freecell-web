@@ -52,6 +52,16 @@
     reverse
     (into [])))
 
+(defprotocol Column
+  (get-all-cards [this])
+  (has-cards? [this])
+  (top-card [this])
+  (movable-subset [this])
+  (put-card [this card])
+  (put-cards [this new-cards])
+  (drop-card [this])
+  (drop-cards [this n]))
+
 (defn safe-inc [n]
   (if n
     (inc n)
@@ -64,7 +74,7 @@
       (not (= (color card) (color on)))
       (= (:n on) (safe-inc (:n card))))))
 
-(defn movable-subset [column]
+(defn- movable-subset* [column]
   (when (seq column)
     (loop [subset [(first column)]
            card (first column)
@@ -77,18 +87,54 @@
             (rest remaining))
           subset)))))
 
+(extend-protocol Column
+  nil
+  (get-all-cards [this]
+    nil)
+  (has-cards? [this]
+    false)
+  (top-card [this]
+    nil)
+  (movable-subset [this]
+    nil)
+  (put-card [this card]
+    (cons card nil))
+  (put-cards [this new-cards]
+    new-cards)
+  (drop-card [this]
+    nil)
+  (drop-cards [this n]
+    nil)
+  #?(:clj Object :cljs default)
+  (get-all-cards [this]
+    this)
+  (has-cards? [this]
+    (seq this))
+  (top-card [this]
+    (first this))
+  (movable-subset [this]
+    (movable-subset* this))
+  (put-card [this card]
+    (cons card this))
+  (put-cards [this new-cards]
+    (concat new-cards this))
+  (drop-card [this]
+    (rest this))
+  (drop-cards [this n]
+    (drop n this)))
+
 (defn move-column [from to movable]
   (let [movable-cards (take movable (movable-subset from))]
     (some identity
       (for [i (range (count movable-cards) 0 -1)]
         (let [to-move (take i movable-cards)]
-          (when (goes-on (last to-move) (first to))
-            [(drop i from) (concat to-move to) i]))))))
+          (when (goes-on (last to-move) (top-card to))
+            [(drop-cards from i) (put-cards to to-move) i]))))))
 
 (defn run-move [columns from to movable-to-column movable-to-empty]
   (let [from-col (nth columns from)
         to-col (nth columns to)
-        movable (if (seq to-col) movable-to-column movable-to-empty)]
+        movable (if (has-cards? to-col) movable-to-column movable-to-empty)]
     (when-let [[new-from new-to] (move-column from-col to-col movable)]
       (-> columns
         (assoc from new-from)

@@ -1,14 +1,14 @@
 (ns freecell-web.subs
     (:require [cljs.pprint :refer [pprint]]
               [re-frame.core :refer [reg-sub]]
-              [freecell-web.cards :refer [suits]]
+              [freecell-web.cards :refer [suits get-all-cards]]
               [freecell-web.db :refer [selected]]))
 
 (reg-sub
   :columns
   :<- [:game-state]
   (fn [game-state _]
-    (let [cs (:columns game-state)
+    (let [cs (map get-all-cards (:columns game-state))
           longest (inc (apply max (map count cs)))]
       (for [c cs]
         (concat
