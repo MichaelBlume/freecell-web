@@ -3,13 +3,18 @@
    [freecell-web.cards :refer
     [goes-on run-move sink can-sink should-sink has-cards? top-card put-card drop-card]]))
 
+(defn movable-card-counts [card-state]
+  (let [{:keys [columns freecells]} card-state
+        empty-count (count (filter not freecells))
+        empty-column-count (count (remove has-cards? columns))
+        movable-to-column (* (inc empty-column-count) (inc empty-count))
+        movable-to-empty (* empty-column-count (inc empty-count))]
+    [movable-to-column movable-to-empty]))
+
 (defn move-column [card-state on tn]
   (when (not= on tn)
-    (let [{:keys [columns freecells]} card-state
-          empty-count (count (filter not freecells))
-          empty-column-count (count (remove has-cards? columns))
-          movable-to-column (* (inc empty-column-count) (inc empty-count))
-          movable-to-empty (* empty-column-count (inc empty-count))
+    (let [columns (:columns card-state)
+          [movable-to-column movable-to-empty] (movable-card-counts card-state)
           new-columns (run-move columns on tn movable-to-column movable-to-empty)]
       (when new-columns
         (assoc card-state :columns new-columns)))))
