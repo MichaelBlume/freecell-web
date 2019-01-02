@@ -89,3 +89,9 @@
 (defn autosink [card-state]
   (when-let [new-state (autosink* card-state)]
     (assoc new-state :man-sinked 0)))
+
+(defn fully-autosink [state]
+  (loop [state state]
+    (if-let [new-state (autosink state)]
+      (recur new-state)
+      state)))
