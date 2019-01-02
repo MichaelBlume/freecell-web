@@ -1,7 +1,7 @@
 (ns freecell-web.moves
   (:require
    [freecell-web.cards :refer
-    [goes-on run-move sink can-sink should-sink has-cards? top-card put-card drop-card]]))
+    [goes-on run-move sink can-sink should-sink has-cards? top-card put-card drop-card safe-inc]]))
 
 (defn movable-card-counts [card-state]
   (let [{:keys [columns freecells]} card-state
@@ -52,7 +52,8 @@
     (when (and card (can-sink card sinks))
       (-> card-state
         (update-in [:columns n] drop-card)
-        (update-in [:sinks] #(sink card %))))))
+        (update :sinks #(sink card %))
+        (update :man-sinked safe-inc)))))
 
 (defn freecell-to-sink [card-state n]
   (let [{:keys [freecells sinks]} card-state
@@ -60,7 +61,8 @@
     (when (and card (can-sink card sinks))
       (-> card-state
         (assoc-in [:freecells n] nil)
-        (update-in [:sinks] #(sink card %))))))
+        (update :sinks #(sink card %))
+        (update :man-sinked safe-inc)))))
 
 (defn firstn [s pred]
   (some
@@ -77,8 +79,13 @@
     columns
     #(should-sink (top-card %) sinks)))
 
-(defn autosink [{:keys [:columns :freecells :sinks] :as card-state}]
-  (if-let [n (sinkable-freecell freecells sinks)]
-    (freecell-to-sink card-state n)
+(defn autosink* [{:keys [:columns :freecells :sinks] :as card-state}]
+  (or
+    (when-let [n (sinkable-freecell freecells sinks)]
+      (freecell-to-sink card-state n))
     (when-let [n (sinkable-column columns sinks)]
       (column-to-sink card-state n))))
+
+(defn autosink [card-state]
+  (when-let [new-state (autosink* card-state)]
+    (assoc new-state :man-sinked 0)))
