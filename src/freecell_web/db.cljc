@@ -1,5 +1,7 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
+            [freecell-web.moves :refer [fully-autosink]]
+            [freecell-web.progressive-autoplay :refer [update-autoplay-state]]
             [re-frame.core :refer [reg-sub]]
             #?@(:cljs [[cljs.reader :refer [register-tag-parser!]]])))
 
@@ -14,12 +16,13 @@
 
 (defn selected-area [state] (-> state selected first))
 
-(defn update-card-state [{:keys [::undo-states ::cards-state] :as db} f]
+(defn update-card-state [{:keys [::undo-states ::cards-state autoplay-state] :as db} f]
   (let [new-cs (f (assoc cards-state ::new-game false))]
     (if (and new-cs (not= new-cs cards-state))
       {::undo-states (when-not (winning? cards-state)
                        (cons cards-state undo-states))
        ::redo-states nil
+       :autoplay-state autoplay-state
        :ui-state (init-ui)
        ::cards-state new-cs}
       (clear-ui db))))
@@ -47,35 +50,40 @@
     {::undo-states nil
      ::redo-states nil
      :ui-state (init-ui)
+     :autoplay-state {}
      ::cards-state (init-cards (shuffled-deck))}))
 
-(defn undo [{:keys [::undo-states ::redo-states ::cards-state] :as state}]
+(defn undo [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (when (seq undo-states)
     {::undo-states (rest undo-states)
      ::redo-states (cons cards-state redo-states)
      :ui-state (init-ui)
+     :autoplay-state autoplay-state
      ::cards-state (first undo-states)}))
 
-(defn redo [{:keys [::undo-states ::redo-states ::cards-state]}]
+(defn redo [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (when (seq redo-states)
     {::undo-states (cons cards-state undo-states)
      ::redo-states (rest redo-states)
      :ui-state (init-ui)
+     :autoplay-state autoplay-state
      ::cards-state (first redo-states)}))
 
-(defn reset [{:keys [::undo-states ::redo-states ::cards-state]}]
+(defn reset [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (let [current-and-past (cons cards-state undo-states)
         rewound-over (take-while (complement ::new-game) current-and-past)
         new-undoes-and-start (drop-while (complement ::new-game) current-and-past)]
     {::undo-states (rest new-undoes-and-start)
      :ui-state (init-ui)
      ::cards-state (first new-undoes-and-start)
+     :autoplay-state autoplay-state
      ::redo-states (concat (reverse rewound-over) redo-states)}))
 
-(defn redo-all [{:keys [::undo-states ::redo-states ::cards-state]}]
+(defn redo-all [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (let [future-and-current (reverse (cons cards-state redo-states))]
     {::undo-states (concat (rest future-and-current) undo-states)
      ::cards-state (first future-and-current)
+     :autoplay-state autoplay-state
      :redo-states nil}))
 
 (defn undoing [{:keys [::redo-states]}]
@@ -85,3 +93,18 @@
  :game-state
  (fn [db]
    (::cards-state db)))
+
+(defn run-autoplay [db]
+  (let [ap-state (:autoplay-state db)
+        cards-state (::cards-state db)
+        new-ap-state (update-autoplay-state
+                       ap-state cards-state)]
+    (when-not (= ap-state new-ap-state)
+      (assoc db :autoplay-state new-ap-state))))
+
+(reg-sub
+  :score
+  (fn [db]
+    (let [sinked (fully-autosink (::cards-state db))
+          result (get-in db [:autoplay-state sinked :score])]
+      result)))
