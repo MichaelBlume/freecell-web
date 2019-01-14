@@ -6,13 +6,15 @@
             [freecell-web.db :refer
              [selected update-card-state init-state
               undo redo clear-ui undoing init-cards
-              reset redo-all]]))
+              reset redo-all run-autoplay]]))
 
 (reg-event-db
   :initialize-db
   (fn  [db _]
     (if (seq db)
-      (update-card-state db (constantly (init-cards)))
+      (-> db
+          (update-card-state (constantly (init-cards)))
+          (dissoc :autoplay-state))
       (init-state (get-object "freecell-state")))))
 
 (reg-event-db
@@ -81,7 +83,7 @@
     (if (::saved db)
       db
       (let [new-db (assoc db ::saved true)]
-        (save-state new-db)
+        (save-state (dissoc new-db :autoplay-state))
         new-db))))
 
 (reg-event-db
@@ -90,3 +92,8 @@
     (reset db)))
 
 (reg-event-db :redo-all (fn [db _] (redo-all db)))
+
+(reg-event-db
+  :inc-autoplay
+  (fn [db _]
+    (or (run-autoplay db) db)))

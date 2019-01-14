@@ -95,7 +95,7 @@
   (get-all-cards [this]
     (concat movable immovable))
   (has-cards? [this]
-    (seq movable))
+    (some? movable))
   (top-card [this]
     (first movable))
   (movable-subset [this]
@@ -103,21 +103,21 @@
   (put-card [this card]
     (FastColumn. (cons card movable) immovable))
   (put-cards [this cards]
-    (FastColumn. (concat cards movable) immovable))
+    (FastColumn. (into [] (concat cards movable)) immovable))
   (drop-card [this]
     (case (count movable)
       0 (FastColumn. nil nil)
       1 (make-fast-column immovable)
-      (FastColumn. (rest movable) immovable)))
+      (FastColumn. (next movable) immovable)))
   (drop-cards [this n]
     (let [mcount (count movable)]
       (if (>= n mcount)
         (make-fast-column (drop (- n mcount) immovable))
-        (FastColumn. (drop n movable) immovable)))))
+        (FastColumn. (into [] (drop n movable)) immovable)))))
 
 (defn make-fast-column [cards]
   (let [movable (movable-subset* cards)
-        immovable (drop (count movable) cards)]
+        immovable (seq (drop (count movable) cards))]
     (->FastColumn movable immovable)))
 
 (extend-protocol Column

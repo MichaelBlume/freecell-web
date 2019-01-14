@@ -3,6 +3,7 @@
             [cljs.pprint :refer [pprint]]
             [clojure.string :refer [join]]
             [freecell-web.subs]
+            [freecell-web.db]
             [freecell-web.cards :refer [display-string color]]))
 
 (defn classes [& cs]
@@ -92,13 +93,19 @@
        {:class "debug-panel"}
        [:pre @ds]])))
 
+(defn can-win []
+  (let [score (subscribe [:score])]
+    (fn []
+      [:div
+       [:p @score]])))
+
 (defn main-panel []
   [:div
    {:class "freecell-game"}
    [button-row]
    [top-row]
    [columns]
-   [debug]])
+   [can-win]])
 
 (defn dispatch-timer-event []
   (dispatch [:auto-sink]))
@@ -111,3 +118,6 @@
 
 (defonce save-timer
   (js/setInterval dispatch-save-timer-event 5000))
+
+(defonce autoplay-timer
+  (js/setInterval #(dispatch [:inc-autoplay]) 5))
