@@ -10,7 +10,7 @@
   (if state
     (if (winning? state)
       :win
-      (- (scoring/score-state state)))
+      (scoring/score-state state))
     (throw-error "But where is state")))
 
 (defn get-scores [autoplay-state states]
