@@ -1,6 +1,5 @@
 (ns freecell-web.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [cljs.pprint :refer [pprint]]
             [clojure.string :refer [join]]
             [freecell-web.subs]
             [freecell-web.db]
