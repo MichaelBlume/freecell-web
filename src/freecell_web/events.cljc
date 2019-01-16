@@ -13,8 +13,8 @@
   (fn  [db _]
     (if (seq db)
       (-> db
-          (update-card-state (constantly (init-cards)))
-          (dissoc :autoplay-state))
+        (update-card-state (constantly (init-cards)))
+        (dissoc :autoplay-state))
       (init-state (get-object "freecell-state")))))
 
 (reg-event-db
