@@ -1,7 +1,6 @@
 (ns freecell-web.views
   (:require [re-frame.core :refer [subscribe dispatch]]
             [clojure.string :refer [join]]
-            [freecell-web.subs]
             [freecell-web.db]
             [freecell-web.cards :refer [display-string color]]))
 
