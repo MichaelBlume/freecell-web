@@ -57,8 +57,14 @@
       [state (decrement-score score)])
     [nil :no-win]))
 
+(defn sort-freecells [state]
+  (update state :freecells #(->> % (sort-by hash) (into []))))
+
+(defn standardize-state [state]
+  (-> state fully-autosink sort-freecells))
+
 (defn insert-children [ap-state game-state]
-  (let [children (map fully-autosink (reachable-states game-state))]
+  (let [children (map standardize-state (reachable-states game-state))]
     (loop [ap-state ap-state
            children children
            children-to-insert []]
