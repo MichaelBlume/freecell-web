@@ -9,10 +9,10 @@
                  :when (empty? (:immovable column))]
              (count (:movable column)))))
 
-;; Lower scores are better. Like Golf.
+;; Higher scores are better
 (defn score-state [card-state]
   (+
-    (* 15 (:man-sinked card-state))
-    (* -2 (sinked-cards card-state))
-    (- (count-based-cards card-state))
-    (- (* 4 (Math/sqrt (first (movable-card-counts card-state)))))))
+    (* -15 (:man-sinked card-state))
+    (* 2 (sinked-cards card-state))
+    (count-based-cards card-state)
+    (* 4 (Math/sqrt (first (movable-card-counts card-state))))))

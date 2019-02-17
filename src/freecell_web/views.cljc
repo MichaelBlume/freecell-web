@@ -1,8 +1,6 @@
 (ns freecell-web.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [cljs.pprint :refer [pprint]]
             [clojure.string :refer [join]]
-            [freecell-web.subs]
             [freecell-web.db]
             [freecell-web.cards :refer [display-string color]]))
 
@@ -106,18 +104,3 @@
    [top-row]
    [columns]
    [can-win]])
-
-(defn dispatch-timer-event []
-  (dispatch [:auto-sink]))
-
-(defonce do-timer
-  (js/setInterval dispatch-timer-event 250))
-
-(defn dispatch-save-timer-event []
-  (dispatch [:save-state]))
-
-(defonce save-timer
-  (js/setInterval dispatch-save-timer-event 5000))
-
-(defonce autoplay-timer
-  (js/setInterval #(dispatch [:inc-autoplay]) 5))

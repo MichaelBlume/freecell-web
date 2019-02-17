@@ -2,7 +2,7 @@
   (:require [re-frame.core :refer [reg-event-db]]
             [freecell-web.moves :refer
              [move-column freecell-to-column column-to-freecell column-to-sink freecell-to-sink autosink]]
-            [freecell-web.storage :refer [get-object save-state]]
+            [freecell-web.storage :refer [get-object store-object]]
             [freecell-web.db :refer
              [selected update-card-state init-state
               undo redo clear-ui undoing init-cards
@@ -13,8 +13,8 @@
   (fn  [db _]
     (if (seq db)
       (-> db
-          (update-card-state (constantly (init-cards)))
-          (dissoc :autoplay-state))
+        (update-card-state (constantly (init-cards)))
+        (dissoc :autoplay-state))
       (init-state (get-object "freecell-state")))))
 
 (reg-event-db
@@ -83,7 +83,7 @@
     (if (::saved db)
       db
       (let [new-db (assoc db ::saved true)]
-        (save-state (dissoc new-db :autoplay-state))
+        (store-object "freecell-state" (dissoc new-db :autoplay-state))
         new-db))))
 
 (reg-event-db

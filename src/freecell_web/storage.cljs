@@ -11,6 +11,3 @@
 (defn get-object [k]
   (when-let [s (.getItem store k)]
     (read-string s)))
-
-(defn save-state [db]
-  (store-object "freecell-state" db))
