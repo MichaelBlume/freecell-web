@@ -1,5 +1,6 @@
 git fetch
 git merge origin/master
+lein clean
 lein cljsbuild once min
 mkdir -p js/compiled
 mkdir -p css
