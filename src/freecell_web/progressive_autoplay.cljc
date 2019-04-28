@@ -82,6 +82,11 @@
               (conj children-to-insert child))))
         (assoc-in ap-state [game-state :children] children-to-insert)))))
 
+(defn maybe-insert-children [ap-state game-state]
+  (if (get-in ap-state [game-state :children])
+    ap-state
+    (insert-children ap-state game-state)))
+
 (defn update-autoplay-state [autoplay-state starting-state]
   (let [fully-sinked (fully-autosink starting-state)]
     (loop [game-state fully-sinked]
@@ -101,3 +106,54 @@
                       (update-score autoplay-state game-state score)))))
               (insert-children autoplay-state game-state)))
           (insert-score autoplay-state game-state))))))
+
+(defn lose-blitz [ap-state losing-states]
+  (reduce
+    #(update-score %1 %2 :no-win)
+    ap-state
+    losing-states))
+
+(defn finish-blitz [ap-state visited-states terminal-states]
+  (let [available-scores (get-scores ap-state terminal-states)
+        missing-scores (children-without-scores terminal-states available-scores)
+        ap-state (insert-child-scores ap-state missing-scores)
+        ;; Yes, again
+        available-scores (get-scores ap-state terminal-states)
+        best-score (second (highest-scoring-entry available-scores))
+        best-score-num (score->num best-score)]
+    (reduce
+      (fn [ap-state game-state]
+        (update-in ap-state [game-state :score]
+          (fn [old-score]
+            (let [old-score (or old-score (score-state game-state))]
+              (if (> (score->num old-score) best-score-num)
+                best-score
+                old-score)))))
+      ap-state
+      visited-states)))
+
+(def empty-queue
+  #?(:clj clojure.lang.PersistentQueue/EMPTY
+     :cljs cljs.core.PersistentQueue.EMPTY))
+
+(defn blitz [autoplay-state starting-state max-states]
+  (let [fully-sinked (fully-autosink starting-state)]
+    (loop [ap-state autoplay-state
+           visited-states #{fully-sinked}
+           q (conj empty-queue fully-sinked)
+           to-visit max-states]
+      (if (empty? q)
+        (lose-blitz ap-state visited-states)
+        (if (= to-visit 0)
+          (finish-blitz ap-state visited-states q)
+          (let [next-state (peek q)
+                ap-state (maybe-insert-children ap-state next-state)
+                children (get-in ap-state [next-state :children])
+                children-to-visit (remove visited-states children)
+                q (pop q)
+                q (reduce conj q children-to-visit)]
+            (recur
+              ap-state
+              (into visited-states children-to-visit)
+              q
+              (dec to-visit))))))))
