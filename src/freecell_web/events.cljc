@@ -100,5 +100,5 @@
 
 (reg-event-db
   :blitz
-  (fn [db _]
-    (blitz-autoplay db)))
+  (fn [db [_ states]]
+    (blitz-autoplay db states)))

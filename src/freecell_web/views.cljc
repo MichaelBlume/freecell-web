@@ -64,9 +64,9 @@
          ^{:key i}
          [column i c])])))
 
-(defn button [text event]
+(defn button [text & event]
   [:button
-   {:on-click #(dispatch [event])}
+   {:on-click #(dispatch (into [] event))}
    text])
 
 (defn button-row []
@@ -78,7 +78,9 @@
    [button "New game" :initialize-db]
    [button "Redo" :redo]
    [button "Redo All" :redo-all]
-   [button "Blitz" :blitz]])
+   [button "Blitz" :blitz 500]
+   [button "Blitz5000" :blitz 5000]
+   [button "BlitzMax" :blitz 50000]])
 
 (defn debug []
   (let [ds (subscribe [:debug])]
