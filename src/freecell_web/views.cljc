@@ -64,25 +64,20 @@
          ^{:key i}
          [column i c])])))
 
+(defn button [text event]
+  [:button
+   {:on-click #(dispatch [event])}
+   text])
+
 (defn button-row []
   [:div
    {:style {:float :down}
     :class "bottom-row"}
-   [:button
-    {:on-click #(dispatch [:reset])}
-    "Reset"]
-   [:button
-    {:on-click #(dispatch [:undo])}
-    "Undo"]
-   [:button
-    {:on-click #(dispatch [:initialize-db])}
-    "New game"]
-   [:button
-    {:on-click #(dispatch [:redo])}
-    "Redo"]
-   [:button
-    {:on-click #(dispatch [:redo-all])}
-    "Redo All"]])
+   [button "Reset" :reset]
+   [button "Undo" :undo]
+   [button "New game" :initialize-db]
+   [button "Redo" :redo]
+   [button "Redo All" :redo-all]])
 
 (defn debug []
   (let [ds (subscribe [:debug])]
