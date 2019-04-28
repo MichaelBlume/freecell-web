@@ -6,7 +6,7 @@
             [freecell-web.db :refer
              [selected update-card-state init-state
               undo redo clear-ui undoing init-cards
-              reset redo-all run-autoplay]]))
+              reset redo-all run-autoplay blitz-autoplay]]))
 
 (reg-event-db
   :initialize-db
@@ -97,3 +97,8 @@
   :inc-autoplay
   (fn [db _]
     (or (run-autoplay db) db)))
+
+(reg-event-db
+  :blitz
+  (fn [db _]
+    (blitz-autoplay db)))
