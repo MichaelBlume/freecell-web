@@ -102,8 +102,8 @@
     (when-not (= ap-state new-ap-state)
       (assoc db :autoplay-state new-ap-state))))
 
-(defn blitz-autoplay [db]
-  (update db :autoplay-state blitz (::cards-state db) 500))
+(defn blitz-autoplay [db states]
+  (update db :autoplay-state blitz (::cards-state db) states))
 
 (reg-sub
   :score
