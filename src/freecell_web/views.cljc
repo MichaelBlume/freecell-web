@@ -64,9 +64,9 @@
          ^{:key i}
          [column i c])])))
 
-(defn button [text event]
+(defn button [text & event]
   [:button
-   {:on-click #(dispatch [event])}
+   {:on-click #(dispatch (into [] event))}
    text])
 
 (defn button-row []
