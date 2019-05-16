@@ -77,10 +77,7 @@
    [button "Undo" :undo]
    [button "New game" :initialize-db]
    [button "Redo" :redo]
-   [button "Redo All" :redo-all]
-   [button "Blitz" :blitz 500]
-   [button "Blitz5000" :blitz 5000]
-   [button "BlitzMax" :blitz 50000]])
+   [button "Redo All" :redo-all]])
 
 (defn debug []
   (let [ds (subscribe [:debug])]
