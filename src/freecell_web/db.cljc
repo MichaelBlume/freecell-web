@@ -1,7 +1,6 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
-            [freecell-web.moves :refer [fully-autosink]]
-            [freecell-web.progressive-autoplay :refer [update-autoplay-state blitz]]
+            [freecell-web.progressive-autoplay :refer [update-autoplay-state blitz lookup-score]]
             [re-frame.core :refer [reg-sub]]
             #?@(:cljs [[cljs.reader :refer [register-tag-parser!]]])))
 
@@ -108,6 +107,4 @@
 (reg-sub
   :score
   (fn [db]
-    (let [sinked (fully-autosink (::cards-state db))
-          result (get-in db [:autoplay-state sinked :score])]
-      result)))
+    (lookup-score (:autoplay-state db) (::cards-state db))))

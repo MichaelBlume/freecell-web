@@ -157,3 +157,6 @@
               (into visited-states children-to-visit)
               q
               (dec to-visit))))))))
+
+(defn lookup-score [autoplay-state state]
+  (get-in autoplay-state [(fully-autosink state) :score]))
