@@ -3,14 +3,27 @@
             [freecell-web.cards :refer [winning?]]
             [freecell-web.scoring :as scoring]))
 
+(defn into-set [state k]
+  (update state k #(into #{} %)))
+
+(defn deset [state k n]
+  (update state k #(into [] (take n (concat % (repeat nil))))))
+
+(defn canonize-state [state]
+  (-> state fully-autosink (into-set :freecells) (into-set :columns)))
+
+(defn decanonize-state [state]
+  (-> state (deset :columns 8) (deset :freecells 4)))
+
 (defn throw-error [s]
   (throw (#?(:clj IllegalArgumentException. :cljs js/Error.) s)))
 
 (defn score-state [state]
   (if state
-    (if (winning? state)
-      :win
-      (scoring/score-state state))
+    (let [state (decanonize-state state)]
+      (if (winning? state)
+        :win
+        (scoring/score-state state)))
     (throw-error "But where is state")))
 
 (defn get-scores [autoplay-state states]
@@ -57,14 +70,8 @@
       [state (decrement-score score)])
     [nil :no-win]))
 
-(defn sort-freecells [state]
-  (update state :freecells #(->> % (sort-by hash) (into []))))
-
-(defn standardize-state [state]
-  (-> state fully-autosink sort-freecells))
-
 (defn insert-children [ap-state game-state]
-  (let [children (map standardize-state (reachable-states game-state))]
+  (let [children (map canonize-state (reachable-states (decanonize-state game-state)))]
     (loop [ap-state ap-state
            children children
            children-to-insert []]
@@ -88,24 +95,23 @@
     (insert-children ap-state game-state)))
 
 (defn update-autoplay-state [autoplay-state starting-state]
-  (let [fully-sinked (fully-autosink starting-state)]
-    (loop [game-state fully-sinked]
-      (let [state-info (get autoplay-state game-state)]
-        (if-let [state-score (:score state-info)]
-          (if (= state-score :win)
-            autoplay-state
-            (if-let [children (:children state-info)]
-              (let [child-scores (get-scores autoplay-state children)
-                    missing-children (children-without-scores
-                                       children child-scores)]
-                (if (seq missing-children)
-                  (insert-child-scores autoplay-state missing-children)
-                  (let [[child score] (highest-scoring-entry child-scores)]
-                    (if (= score state-score)
-                      (recur child)
-                      (update-score autoplay-state game-state score)))))
-              (insert-children autoplay-state game-state)))
-          (insert-score autoplay-state game-state))))))
+  (loop [game-state (canonize-state starting-state)]
+    (let [state-info (get autoplay-state game-state)]
+      (if-let [state-score (:score state-info)]
+        (if (= state-score :win)
+          autoplay-state
+          (if-let [children (:children state-info)]
+            (let [child-scores (get-scores autoplay-state children)
+                  missing-children (children-without-scores
+                                     children child-scores)]
+              (if (seq missing-children)
+                (insert-child-scores autoplay-state missing-children)
+                (let [[child score] (highest-scoring-entry child-scores)]
+                  (if (= score state-score)
+                    (recur child)
+                    (update-score autoplay-state game-state score)))))
+            (insert-children autoplay-state game-state)))
+        (insert-score autoplay-state game-state)))))
 
 (defn lose-blitz [ap-state losing-states]
   (reduce
@@ -157,3 +163,6 @@
               (into visited-states children-to-visit)
               q
               (dec to-visit))))))))
+
+(defn lookup-score [autoplay-state state]
+  (get-in autoplay-state [(canonize-state state) :score]))
