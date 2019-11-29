@@ -31,9 +31,7 @@
                    "unselected-freecell")}
          [card c ["freecell"]
           #(dispatch [:click-freecell i])]]
-        [card c ["freecell" (if @selected
-                              "selected-freecell"
-                              "unselected-freecell")]
+        [card c ["freecell"]
          #(dispatch [:click-freecell i])]))))
 
 (defn freecells []
