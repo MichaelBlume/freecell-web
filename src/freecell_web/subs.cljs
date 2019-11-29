@@ -29,6 +29,11 @@
     (= [:column n] (selected db))))
 
 (reg-sub
+  :selected-freecell
+  (fn [db [_ n]]
+    (= [:freecell n] (selected db))))
+
+(reg-sub
   ; re-built every time game-state changes -- bad?
   :sinks
   :<- [:game-state]
