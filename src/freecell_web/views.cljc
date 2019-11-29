@@ -54,10 +54,8 @@
    [sinks]])
 
 (defn column [i cards]
-  (println "column called")
   (let [selected (subscribe [:selected i])]
     (fn [i cards]
-      (println "column inner fn called")
       [:div
        {:class (classes "card-column" (when @selected "card-column-selected"))
         :on-click #(dispatch [:click-column i])}
