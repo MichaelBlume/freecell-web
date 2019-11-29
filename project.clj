@@ -2,7 +2,8 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.660"]
                  [reagent "0.7.0"]
-                 [re-frame "0.9.4"]]
+                 [re-frame "0.9.4"]
+                 [com.cemerick/url "0.1.1"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]]
 
