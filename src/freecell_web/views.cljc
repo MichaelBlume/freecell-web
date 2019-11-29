@@ -21,18 +21,14 @@
   (map-indexed vector l))
 
 (defn freecell [i c]
-  (let [selected (subscribe [:selected-freecell i])
-        wrapper-div (subscribe [:feature-flag :wrapper-div])]
+  (let [selected (subscribe [:selected-freecell i])]
     (fn [i c]
-      (if @wrapper-div
-        [:div
-         {:class (if @selected
-                   "selected-freecell"
-                   "unselected-freecell")}
-         [card c "freecell"
-          #(dispatch [:click-freecell i])]]
-        [card c "freecell"
-         #(dispatch [:click-freecell i])]))))
+      [:div
+       {:class (if @selected
+                 "selected-freecell"
+                 "unselected-freecell")}
+       [card c "freecell"
+        #(dispatch [:click-freecell i])]])))
 
 (defn freecells []
   (let [cells (subscribe [:cells])]

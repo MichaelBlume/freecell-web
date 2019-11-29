@@ -73,3 +73,10 @@ body { font-family: "Noto Sans", "Verdana", sans-serif; }
 .debug-panel {
   overflow: auto;
 }
+
+.unselected-freecell, .selected-freecell {
+    display: inline-block;
+}
+.selected-freecell {
+    background-color: #cfc;
+}
