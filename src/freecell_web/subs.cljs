@@ -1,6 +1,7 @@
 (ns freecell-web.subs
     (:require [cljs.pprint :refer [pprint]]
               [re-frame.core :refer [reg-sub]]
+              [cemerick.url :refer [url]]
               [freecell-web.cards :refer [suits get-all-cards]]
               [freecell-web.db :refer [selected]]))
 
@@ -48,3 +49,8 @@
   (fn [game-state _]
     (with-out-str
       (pprint game-state))))
+
+(reg-sub
+  :feature-flag
+  (fn [db [_ flag-name]]
+    (-> js/window .-location .-href url :query (get (name flag-name)))))

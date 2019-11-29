@@ -7,13 +7,13 @@
 (defn classes [& cs]
   (join \space (map name (filter identity cs))))
 
-(defn card [c card-classes & [on-click]]
+(defn card [c location & [on-click]]
   [:span
    {:class
     (if c
-      (apply classes
-        (color c) (:suit c) (str "n" (:n c)) "card" card-classes)
-      (apply classes "no-card" card-classes))
+      (classes
+        (color c) (:suit c) (str "n" (:n c)) "card" location)
+      (classes "no-card" location))
     :on-click on-click}
    (display-string c)])
 
@@ -21,12 +21,18 @@
   (map-indexed vector l))
 
 (defn freecell [i c]
-  (let [selected (subscribe [:selected-freecell i])]
+  (let [selected (subscribe [:selected-freecell i])
+        wrapper-div (subscribe [:feature-flag :wrapper-div])]
     (fn [i c]
-      [card c ["freecell" (if @selected
-                            "selected-freecell"
-                            "unselected-freecell")]
-       #(dispatch [:click-freecell i])])))
+      (if @wrapper-div
+        [:div
+         {:class (if @selected
+                   "selected-freecell"
+                   "unselected-freecell")}
+         [card c "freecell"
+          #(dispatch [:click-freecell i])]]
+        [card c "freecell"
+         #(dispatch [:click-freecell i])]))))
 
 (defn freecells []
   (let [cells (subscribe [:cells])]
@@ -45,7 +51,7 @@
         :on-click #(dispatch [:click-sink])}
        (for [c @cards]
          ^{:key (:suit c)}
-         [card c ["sink"]])])))
+         [card c "sink"])])))
 
 (defn top-row []
   [:div
@@ -61,7 +67,7 @@
         :on-click #(dispatch [:click-column i])}
        (for [[i c] (enumerate (or (seq (reverse cards)) [nil]))]
          ^{:key i}
-         [card c ["column"]])])))
+         [card c "column"])])))
 
 (defn columns []
   (let [cs (subscribe [:columns])]
