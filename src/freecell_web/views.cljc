@@ -20,6 +20,14 @@
 (defn enumerate [l]
   (map-indexed vector l))
 
+(defn freecell [i c]
+  (let [selected (subscribe [:selected-freecell i])]
+    (fn [i c]
+      [card c ["freecell" (if @selected
+                            "selected-freecell"
+                            "unselected-freecell")]
+       #(dispatch [:click-freecell i])])))
+
 (defn freecells []
   (let [cells (subscribe [:cells])]
     (fn []
@@ -27,7 +35,7 @@
        {:class "hold-freecells"}
        (for [[i c] (enumerate @cells)]
          ^{:key i}
-         [card c ["freecell"] #(dispatch [:click-freecell i])])])))
+         [freecell i c])])))
 
 (defn sinks []
   (let [cards (subscribe [:sinks])]
