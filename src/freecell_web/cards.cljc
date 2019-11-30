@@ -106,7 +106,7 @@
     (FastColumn. (into [] (concat cards movable)) immovable))
   (drop-card [this]
     (case (count movable)
-      0 (FastColumn. nil nil)
+      0 nil
       1 (make-fast-column immovable)
       (FastColumn. (next movable) immovable)))
   (drop-cards [this n]
@@ -116,9 +116,10 @@
         (FastColumn. (into [] (drop n movable)) immovable)))))
 
 (defn make-fast-column [cards]
-  (let [movable (movable-subset* cards)
-        immovable (seq (drop (count movable) cards))]
-    (->FastColumn movable immovable)))
+  (when (seq cards)
+    (let [movable (movable-subset* cards)
+          immovable (seq (drop (count movable) cards))]
+      (->FastColumn movable immovable))))
 
 (extend-protocol Column
   nil
@@ -135,9 +136,9 @@
   (put-cards [this new-cards]
     (->FastColumn new-cards nil))
   (drop-card [this]
-    (->FastColumn nil nil))
+    nil)
   (drop-cards [this n]
-    (->FastColumn nil nil))
+    nil)
   #?(:clj Object :cljs default)
   (get-all-cards [this]
     this)
