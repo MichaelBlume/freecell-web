@@ -7,14 +7,13 @@
 (defn classes [& cs]
   (join \space (map name (filter identity cs))))
 
-(defn card [c location & [on-click]]
+(defn card [c location]
   [:span
    {:class
     (if c
       (classes
         (color c) (:suit c) (str "n" (:n c)) "card" location)
-      (classes "no-card" location))
-    :on-click on-click}
+      (classes "no-card" location))}
    (display-string c)])
 
 (defn enumerate [l]
@@ -26,9 +25,9 @@
       [:div
        {:class (if @selected
                  "selected-freecell"
-                 "unselected-freecell")}
-       [card c "freecell"
-        #(dispatch [:click-freecell i])]])))
+                 "unselected-freecell")
+        :on-click #(dispatch [:click-freecell i])}
+       [card c "freecell"]])))
 
 (defn freecells []
   (let [cells (subscribe [:cells])]
