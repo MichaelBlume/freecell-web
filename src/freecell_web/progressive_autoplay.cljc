@@ -113,6 +113,16 @@
             (insert-children autoplay-state game-state)))
         (insert-score autoplay-state game-state)))))
 
+(defn get-next-move [ap-state starting-state]
+  (let [potential-moves (reachable-states starting-state)]
+    (apply max-key
+      (fn [state]
+        (let [canonical (canonize-state state)]
+          (score->num
+            (or (get-in ap-state [canonical :score])
+                :no-win))))
+      potential-moves)))
+
 (defn lose-blitz [ap-state losing-states]
   (reduce
     #(update-score %1 %2 :no-win)
