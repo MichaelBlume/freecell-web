@@ -10,7 +10,7 @@
 
 (reg-event-db
   :initialize-db
-  (fn  [db _]
+  (fn [db _]
     (if (seq db)
       (-> db
         (update-card-state (constantly (init-cards)))
