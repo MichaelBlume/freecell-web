@@ -86,6 +86,7 @@
    [button "Reset" :reset]
    [button "Undo" :undo]
    [button "New game" :initialize-db]
+   [button "Autoplay" :play-auto]
    [button "Redo" :redo]
    [button "Redo All" :redo-all]])
 

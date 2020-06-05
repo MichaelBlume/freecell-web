@@ -1,6 +1,7 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
-            [freecell-web.progressive-autoplay :refer [update-autoplay-state blitz lookup-score]]
+            [freecell-web.progressive-autoplay :refer [update-autoplay-state blitz
+                                                       lookup-score get-next-move]]
             [re-frame.core :refer [reg-sub]]
             #?@(:cljs [[cljs.reader :refer [register-tag-parser!]]])))
 
@@ -103,6 +104,15 @@
 
 (defn blitz-autoplay [db states]
   (update db :autoplay-state blitz (::cards-state db) states))
+
+(defn autoplay-one-move [db]
+  (let [ap-state (:autoplay-state db)]
+    (update-card-state
+      db
+      (fn [cards-state]
+        (get-next-move
+          ap-state
+          cards-state)))))
 
 (reg-sub
   :score

@@ -4,7 +4,7 @@
              [move-column freecell-to-column column-to-freecell column-to-sink freecell-to-sink autosink]]
             [freecell-web.storage :refer [get-object store-object]]
             [freecell-web.db :refer
-             [selected update-card-state init-state
+             [selected update-card-state init-state autoplay-one-move
               undo redo clear-ui undoing init-cards
               reset redo-all run-autoplay blitz-autoplay]]))
 
@@ -16,6 +16,11 @@
         (update-card-state (constantly (init-cards)))
         (dissoc :autoplay-state))
       (init-state (get-object "freecell-state")))))
+
+(reg-event-db
+  :play-auto
+  (fn [db _]
+    (autoplay-one-move db)))
 
 (reg-event-db
   :click-column
