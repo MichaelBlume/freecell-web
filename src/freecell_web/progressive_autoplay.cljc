@@ -1,29 +1,19 @@
-(ns freecell-web.progressive-autoplay
-  (:require [freecell-web.moves :refer [fully-autosink reachable-states]]
-            [freecell-web.cards :refer [winning?]]
-            [freecell-web.scoring :as scoring]))
+(ns freecell-web.progressive-autoplay)
 
-(defn into-set [state k]
-  (update state k #(into #{} %)))
-
-(defn deset [state k n]
-  (update state k #(into [] (take n (concat % (repeat nil))))))
-
-(defn canonize-state [state]
-  (-> state fully-autosink (into-set :freecells) (into-set :columns)))
-
-(defn decanonize-state [state]
-  (-> state (deset :columns 8) (deset :freecells 4)))
+(defprotocol SolitaireGame
+  ;; Higher scores are better
+  (score-state [this state])
+  (reachable-states [this state])
+  (canonize-state [this state])
+  (decanonize-state [this canonical-state]))
 
 (defn throw-error [s]
   (throw (#?(:clj IllegalArgumentException. :cljs js/Error.) s)))
 
-(defn score-state [state]
+(defn score-canonical-state [game state]
   (if state
-    (let [state (decanonize-state state)]
-      (if (winning? state)
-        :win
-        (scoring/score-state state)))
+    (let [state (decanonize-state game state)]
+      (score-state game state))
     (throw-error "But where is state")))
 
 (defn get-scores [autoplay-state states]
@@ -42,7 +32,7 @@
   (assoc-in ap-state [game-state :score] score))
 
 (defn insert-score [ap-state game-state]
-  (update-score ap-state game-state (score-state game-state)))
+  (update-score ap-state game-state (score-canonical-state (::game ap-state) game-state)))
 
 (defn insert-child-scores [autoplay-state missing-children]
   (reduce insert-score autoplay-state missing-children))
@@ -71,7 +61,9 @@
     [nil :no-win]))
 
 (defn insert-children [ap-state game-state]
-  (let [children (map canonize-state (reachable-states (decanonize-state game-state)))]
+  (let [game (::game ap-state)
+        children (map #(canonize-state game %)
+                      (reachable-states game (decanonize-state game game-state)))]
     (loop [ap-state ap-state
            children children
            children-to-insert []]
@@ -95,7 +87,7 @@
     (insert-children ap-state game-state)))
 
 (defn update-autoplay-state [autoplay-state starting-state]
-  (loop [game-state (canonize-state starting-state)]
+  (loop [game-state (canonize-state (::game autoplay-state) starting-state)]
     (let [state-info (get autoplay-state game-state)]
       (if-let [state-score (:score state-info)]
         (if (= state-score :win)
@@ -114,10 +106,11 @@
         (insert-score autoplay-state game-state)))))
 
 (defn get-next-move [ap-state starting-state]
-  (let [potential-moves (reachable-states starting-state)]
+  (let [game (::game ap-state)
+        potential-moves (reachable-states game starting-state)]
     (apply max-key
       (fn [state]
-        (let [canonical (canonize-state state)]
+        (let [canonical (canonize-state game state)]
           (score->num
             (or (get-in ap-state [canonical :score])
                 :no-win))))
@@ -141,7 +134,7 @@
       (fn [ap-state game-state]
         (update-in ap-state [game-state :score]
           (fn [old-score]
-            (let [old-score (or old-score (score-state game-state))]
+            (let [old-score (or old-score (score-canonical-state (::game ap-state) game-state))]
               (if (> (score->num old-score) best-score-num)
                 best-score
                 old-score)))))
@@ -153,7 +146,8 @@
      :cljs cljs.core.PersistentQueue.EMPTY))
 
 (defn blitz [autoplay-state starting-state max-states]
-  (let [fully-sinked (fully-autosink starting-state)]
+  (let [game (::game autoplay-state)
+        fully-sinked (canonize-state game starting-state)]
     (loop [ap-state autoplay-state
            visited-states #{fully-sinked}
            q (conj empty-queue fully-sinked)
@@ -175,4 +169,7 @@
               (dec to-visit))))))))
 
 (defn lookup-score [autoplay-state state]
-  (get-in autoplay-state [(canonize-state state) :score]))
+  (get-in autoplay-state [(canonize-state (::game autoplay-state) state) :score]))
+
+(defn make-ap-state [game]
+  {::game game})
