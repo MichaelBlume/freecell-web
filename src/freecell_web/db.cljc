@@ -48,13 +48,11 @@
 
 (defn init-state
   [saved]
-  (if saved
-    saved
-    {::undo-states nil
-     ::redo-states nil
-     :ui-state (init-ui)
-     :autoplay-state {}
-     ::cards-state (init-cards (shuffled-deck))}))
+  (or saved
+      {::undo-states nil
+       ::redo-states nil
+       :ui-state (init-ui)
+       ::cards-state (init-cards (shuffled-deck))}))
 
 (defn undo [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (when (seq undo-states)
