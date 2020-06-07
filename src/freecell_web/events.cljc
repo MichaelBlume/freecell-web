@@ -5,17 +5,16 @@
             [freecell-web.storage :refer [get-object store-object]]
             [freecell-web.db :refer
              [selected update-card-state init-state autoplay-one-move
-              undo redo clear-ui undoing init-cards
+              undo redo clear-ui undoing init-cards clear-autoplay-state
               reset redo-all run-autoplay blitz-autoplay]]))
 
 (reg-event-db
   :initialize-db
   (fn  [db _]
-    (if (seq db)
-      (-> db
-        (update-card-state (constantly (init-cards)))
-        (dissoc :autoplay-state))
-      (init-state (get-object "freecell-state")))))
+    (clear-autoplay-state
+      (if (seq db)
+        (update-card-state db (constantly (init-cards)))
+        (init-state (get-object "freecell-state"))))))
 
 (reg-event-db
   :play-auto

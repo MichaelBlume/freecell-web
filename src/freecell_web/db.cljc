@@ -1,7 +1,9 @@
 (ns freecell-web.db
   (:require [freecell-web.cards :refer [shuffled-deck make-columns winning?]]
+            [freecell-web.freecell-autoplay :as freecell-autoplay]
             [freecell-web.progressive-autoplay :refer [update-autoplay-state blitz
-                                                       lookup-score get-next-move]]
+                                                       lookup-score get-next-move
+                                                       make-ap-state]]
             [re-frame.core :refer [reg-sub]]
             #?@(:cljs [[cljs.reader :refer [register-tag-parser!]]])))
 
@@ -43,15 +45,16 @@
        :sinks (->Sinks 0 0 0 0)
        ::new-game true})))
 
+(defn clear-autoplay-state [db]
+  (assoc db :autoplay-state (make-ap-state freecell-autoplay/freecell)))
+
 (defn init-state
   [saved]
-  (if saved
-    saved
-    {::undo-states nil
-     ::redo-states nil
-     :ui-state (init-ui)
-     :autoplay-state {}
-     ::cards-state (init-cards (shuffled-deck))}))
+  (or saved
+      {::undo-states nil
+       ::redo-states nil
+       :ui-state (init-ui)
+       ::cards-state (init-cards (shuffled-deck))}))
 
 (defn undo [{:keys [::undo-states ::redo-states ::cards-state autoplay-state]}]
   (when (seq undo-states)
@@ -117,4 +120,5 @@
 (reg-sub
   :score
   (fn [db]
-    (lookup-score (:autoplay-state db) (::cards-state db))))
+    (when-let [ap-state (:autoplay-state db)]
+      (lookup-score ap-state (::cards-state db)))))
