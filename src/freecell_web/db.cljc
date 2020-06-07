@@ -43,6 +43,9 @@
        :sinks (->Sinks 0 0 0 0)
        ::new-game true})))
 
+(defn clear-autoplay-state [db]
+  (dissoc db :autoplay-state))
+
 (defn init-state
   [saved]
   (if saved
